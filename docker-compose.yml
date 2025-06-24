@@ -5,9 +5,9 @@ services:
             dockerfile: Dockerfile
         container_name: backend_app
         ports:
-            - '3000:3000'
+            - '3001:3000'
         env_file:
-            - .env
+            - .env.docker
         depends_on:
             - postgres
             - redis

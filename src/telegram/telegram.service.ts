@@ -1,7 +1,9 @@
 import { Injectable } from '@nestjs/common'
+import { ConfigService } from '@nestjs/config'
 
 @Injectable()
 export class TelegramService {
+	public constructor(private readonly configService: ConfigService) {}
 	public async sendMessage(
 		text: string,
 		withButton = false,
@@ -20,7 +22,7 @@ export class TelegramService {
 						[
 							{
 								text: '✅ Подтвердить выдачу',
-								url: `https://94b7-150-241-84-120.ngrok-free.app/api/item/confirm-issuance/${userId}`
+								url: `${this.configService.getOrThrow<string>('PUBLIC_URL')}/api/item/confirm-issuance/${userId}`
 								// url: `http://localhost:5173/api/item/confirm-issuance/${userId}`
 							}
 						]
