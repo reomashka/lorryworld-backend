@@ -2,10 +2,12 @@ FROM node:22-alpine
 
 WORKDIR /app
 
+# Копируем package для установки зависимостей
 COPY package.json package-lock.json ./
 
 RUN npm install
 
+# Копируем остальной исходный код
 COPY . .
 
 RUN npx prisma generate
