@@ -85,12 +85,12 @@ export class AuthService {
 			throw new UnauthorizedException('Неверный пароль.')
 		}
 
-		if (!user.isVerified) {
-			// await this.emailConfirmationService.sendVerificationToken(user)
-			throw new UnauthorizedException(
-				'Ваш email не подтвержден. Пожалуйста, проверьте почту и подтвердите адрес'
-			)
-		}
+		// if (!user.isVerified) {
+		// 	// await this.emailConfirmationService.sendVerificationToken(user)
+		// 	throw new UnauthorizedException(
+		// 		'Ваш email не подтвержден. Пожалуйста, проверьте почту и подтвердите адрес'
+		// 	)
+		// }
 
 		return this.saveSession(req, user)
 	}
