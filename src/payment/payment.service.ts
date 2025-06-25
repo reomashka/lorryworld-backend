@@ -1,12 +1,6 @@
-import {
-	BadRequestException,
-	Injectable,
-	UnauthorizedException
-} from '@nestjs/common'
+import { BadRequestException, Injectable } from '@nestjs/common'
 import { ConfigService } from '@nestjs/config'
 import { PaymentStatus, PaymentType } from '@prisma/__generated__'
-import * as crypto from 'crypto'
-import { Request, Response } from 'express'
 import { v4 as uuidv4 } from 'uuid'
 
 import { PrismaService } from '@/prisma/prisma.service'
@@ -21,8 +15,6 @@ export class PaymentService {
 		private readonly configService: ConfigService,
 		private readonly prismaService: PrismaService
 	) {}
-	private readonly secret =
-		this.configService.getOrThrow<string>('MORUNE_SECRET_KEY') ?? ''
 
 	public async createPayment(dto: PaymentDto) {
 		const PAYMENT_URL = 'https://api.morune.com/invoice/create'
@@ -61,8 +53,6 @@ export class PaymentService {
 					`HTTP error! status: ${response.status}`
 				)
 			}
-
-			console.log(result.expiresIn)
 
 			const payment = await this.prismaService.payment.create({
 				data: {
@@ -220,21 +210,17 @@ export class PaymentService {
 				return { statusPayment, data: payload }
 			}
 
-			try {
-				const updated = await this.prismaService.user.update({
-					where: { id: userId },
-					data: { balance: { increment: Number(payload.amount) } }
-				})
-				console.log(
-					`✅ Баланс пользователя ${userId} пополнен на ${Number(payload.amount)}`,
-					updated
-				)
-			} catch (e) {
-				console.error(
-					`❌ Ошибка обновления баланса user #${userId}:`,
-					e
-				)
+			const amountInt = parseInt(payload.amount)
+
+			if (isNaN(amountInt)) {
+				console.error(`❌ Invalid amount: ${payload.amount}`)
+				return { statusPayment, data: payload }
 			}
+
+			await this.prismaService.user.update({
+				where: { id: userId },
+				data: { balance: { increment: amountInt } }
+			})
 		}
 
 		return { statusPayment, data: payload }
