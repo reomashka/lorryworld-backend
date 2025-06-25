@@ -170,90 +170,79 @@ export class PaymentService {
 
 		switch (payload.status) {
 			case 'success':
-				if (payload.code === 1) {
-					statusPayment = PaymentStatus.SUCCESS
-				} else {
-					statusPayment = PaymentStatus.UNKNOWN
-				}
+				statusPayment =
+					payload.code === 1
+						? PaymentStatus.SUCCESS
+						: PaymentStatus.UNKNOWN
 				break
-
 			case 'fail':
-				if (payload.code === 31 || payload.code === 32) {
-					statusPayment = PaymentStatus.CANCELLATION
-				} else {
-					statusPayment = PaymentStatus.UNKNOWN
-				}
+				statusPayment = [31, 32].includes(payload.code)
+					? PaymentStatus.CANCELLATION
+					: PaymentStatus.UNKNOWN
 				break
-
 			case 'expired':
 				statusPayment = PaymentStatus.EXPIRED
 				break
-
 			case 'refund':
-				if (payload.code === 20) {
-					statusPayment = PaymentStatus.REFUNDED
-				} else {
-					statusPayment = PaymentStatus.UNKNOWN
-				}
+				statusPayment =
+					payload.code === 20
+						? PaymentStatus.REFUNDED
+						: PaymentStatus.UNKNOWN
 				break
-
 			default:
 				statusPayment = PaymentStatus.UNKNOWN
 				break
 		}
-		// Проверяем, есть ли платеж с таким invoiceId
+
 		const payment = await this.prismaService.payment.findUnique({
-			where: {
-				invoiceId: payload.invoice_id
-			}
+			where: { invoiceId: payload.invoice_id }
 		})
 
 		if (!payment) {
-			// Если платежа нет — можно выбросить ошибку или вернуть
+			console.error(`❌ Payment not found: ${payload.invoice_id}`)
 			throw new Error(
 				`Payment with invoiceId ${payload.invoice_id} not found`
 			)
 		}
 
-		// Обновляем статус платежа
 		await this.prismaService.payment.update({
-			where: {
-				invoiceId: payload.invoice_id
-			},
-			data: {
-				status: statusPayment
-			}
+			where: { invoiceId: payload.invoice_id },
+			data: { status: statusPayment }
 		})
 
-		// Если успешная оплата — обновляем баланс пользователя
 		if (statusPayment === PaymentStatus.SUCCESS) {
-			// Предполагаем, что в payment есть поле userId (если нет — надо получить пользователя из custom_fields)
 			const userId = payment.userId
 
-			if (userId) {
-				// Увеличиваем баланс пользователя на сумму платежа (предполагается, что amount — строка с числом)
-				const amountNumber = Number(payload.amount)
+			if (!userId) {
+				console.warn(`❌ No userId for payment ${payload.invoice_id}`)
+				return { statusPayment, data: payload }
+			}
 
-				if (isNaN(amountNumber)) {
-					throw new Error(`Invalid amount value: ${payload.amount}`)
-				}
+			const rawAmount = payload.amount?.replace(',', '.')
+			const amountNumber = Number(rawAmount)
 
-				await this.prismaService.user.update({
-					where: {
-						id: userId
-					},
-					data: {
-						balance: {
-							increment: amountNumber
-						}
-					}
+			if (!rawAmount || isNaN(amountNumber)) {
+				console.error(`❌ Invalid amount: ${payload.amount}`)
+				return { statusPayment, data: payload }
+			}
+
+			try {
+				const updated = await this.prismaService.user.update({
+					where: { id: userId },
+					data: { balance: { increment: amountNumber } }
 				})
+				console.log(
+					`✅ Баланс пользователя ${userId} пополнен на ${amountNumber}`,
+					updated
+				)
+			} catch (e) {
+				console.error(
+					`❌ Ошибка обновления баланса user #${userId}:`,
+					e
+				)
 			}
 		}
 
-		return {
-			statusPayment,
-			data: payload
-		}
+		return { statusPayment, data: payload }
 	}
 }
