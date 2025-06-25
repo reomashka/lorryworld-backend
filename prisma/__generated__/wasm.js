@@ -233,7 +233,8 @@ exports.PaymentStatus = exports.$Enums.PaymentStatus = {
   SUCCESS: 'SUCCESS',
   CANCELLATION: 'CANCELLATION',
   REFUNDED: 'REFUNDED',
-  EXPIRED: 'EXPIRED'
+  EXPIRED: 'EXPIRED',
+  UNKNOWN: 'UNKNOWN'
 };
 
 exports.ItemType = exports.$Enums.ItemType = {

@@ -1,11 +1,19 @@
-import { BadRequestException, Injectable } from '@nestjs/common'
+import {
+	BadRequestException,
+	Injectable,
+	UnauthorizedException
+} from '@nestjs/common'
 import { ConfigService } from '@nestjs/config'
 import { PaymentStatus, PaymentType } from '@prisma/__generated__'
+import * as crypto from 'crypto'
+import { Request, Response } from 'express'
 import { v4 as uuidv4 } from 'uuid'
 
 import { PrismaService } from '@/prisma/prisma.service'
 
+// ✅
 import { PaymentDto } from './dto/payment.dto'
+import { PaymentWebhookDto } from './dto/paymentWebhook.dto'
 
 @Injectable()
 export class PaymentService {
@@ -13,6 +21,8 @@ export class PaymentService {
 		private readonly configService: ConfigService,
 		private readonly prismaService: PrismaService
 	) {}
+	private readonly secret =
+		this.configService.getOrThrow<string>('MORUNE_SECRET_KEY') ?? ''
 
 	public async createPayment(dto: PaymentDto) {
 		const PAYMENT_URL = 'https://api.morune.com/invoice/create'
@@ -152,5 +162,98 @@ export class PaymentService {
 		})
 
 		return userWithPayments?.payments || []
+	}
+
+	// webhook
+	public async handleWebhook(payload: PaymentWebhookDto) {
+		let statusPayment: PaymentStatus
+
+		switch (payload.status) {
+			case 'success':
+				if (payload.code === 1) {
+					statusPayment = PaymentStatus.SUCCESS
+				} else {
+					statusPayment = PaymentStatus.UNKNOWN
+				}
+				break
+
+			case 'fail':
+				if (payload.code === 31 || payload.code === 32) {
+					statusPayment = PaymentStatus.CANCELLATION
+				} else {
+					statusPayment = PaymentStatus.UNKNOWN
+				}
+				break
+
+			case 'expired':
+				statusPayment = PaymentStatus.EXPIRED
+				break
+
+			case 'refund':
+				if (payload.code === 20) {
+					statusPayment = PaymentStatus.REFUNDED
+				} else {
+					statusPayment = PaymentStatus.UNKNOWN
+				}
+				break
+
+			default:
+				statusPayment = PaymentStatus.UNKNOWN
+				break
+		}
+		// Проверяем, есть ли платеж с таким invoiceId
+		const payment = await this.prismaService.payment.findUnique({
+			where: {
+				invoiceId: payload.invoice_id
+			}
+		})
+
+		if (!payment) {
+			// Если платежа нет — можно выбросить ошибку или вернуть
+			throw new Error(
+				`Payment with invoiceId ${payload.invoice_id} not found`
+			)
+		}
+
+		// Обновляем статус платежа
+		await this.prismaService.payment.update({
+			where: {
+				invoiceId: payload.invoice_id
+			},
+			data: {
+				status: statusPayment
+			}
+		})
+
+		// Если успешная оплата — обновляем баланс пользователя
+		if (statusPayment === PaymentStatus.SUCCESS) {
+			// Предполагаем, что в payment есть поле userId (если нет — надо получить пользователя из custom_fields)
+			const userId = payment.userId
+
+			if (userId) {
+				// Увеличиваем баланс пользователя на сумму платежа (предполагается, что amount — строка с числом)
+				const amountNumber = Number(payload.amount)
+
+				if (isNaN(amountNumber)) {
+					throw new Error(`Invalid amount value: ${payload.amount}`)
+				}
+
+				await this.prismaService.user.update({
+					where: {
+						id: userId
+					},
+					data: {
+						balance: {
+							increment: amountNumber
+						}
+					}
+				})
+			}
+		}
+
+		return {
+			statusPayment,
+			data: payload
+		}
 	}
 }

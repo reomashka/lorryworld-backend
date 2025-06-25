@@ -95,7 +95,8 @@ export const PaymentStatus: {
   SUCCESS: 'SUCCESS',
   CANCELLATION: 'CANCELLATION',
   REFUNDED: 'REFUNDED',
-  EXPIRED: 'EXPIRED'
+  EXPIRED: 'EXPIRED',
+  UNKNOWN: 'UNKNOWN'
 };
 
 export type PaymentStatus = (typeof PaymentStatus)[keyof typeof PaymentStatus]

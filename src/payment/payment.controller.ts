@@ -1,19 +1,22 @@
 import {
-	BadRequestException,
 	Body,
 	Controller,
 	Get,
-	Header,
 	Headers,
+	HttpCode,
+	HttpStatus,
 	Param,
-	Post
+	Post,
+	Req,
+	Res
 } from '@nestjs/common'
-import * as crypto from 'crypto'
-
-import { Authorization } from '@/auth/decorators/auth.decorator'
+import { Request, Response } from 'express'
 
 import { PaymentDto } from './dto/payment.dto'
+import { PaymentWebhookDto } from './dto/paymentWebhook.dto'
 import { PaymentService } from './payment.service'
+
+// ✅
 
 @Controller('payment')
 export class PaymentController {
@@ -29,16 +32,25 @@ export class PaymentController {
 		return this.paymentService.getInfoOfPayment(invoiceId)
 	}
 
-	@Post('webhook')
-	public async handleWebhook(
-		@Headers('x-api-sha256-signature') signature: string,
-		@Body() payload: any
-	) {
-		return this.paymentService.updatePaymentStatus(payload)
-	}
+	// @Post('webhook')
+	// public async handleWebhook(
+	// 	@Headers('x-api-sha256-signature') signature: string,
+	// 	@Body() payload: any
+	// ) {
+	// 	return this.paymentService.updatePaymentStatus(payload)
+	// }
 
 	@Get('get-payments/:userId')
 	public async getPaymentsOfUser(@Param('userId') userId: string) {
 		return this.paymentService.getPaymentsOfUser(userId)
+	}
+
+	@Post('webhook')
+	@HttpCode(HttpStatus.OK)
+	public async handle(
+		@Body() payload: PaymentWebhookDto
+		// @Headers('x-api-sha256-signature') signature: string
+	) {
+		return await this.paymentService.handleWebhook(payload)
 	}
 }

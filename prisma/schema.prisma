@@ -124,6 +124,7 @@ enum PaymentStatus {
   CANCELLATION
   REFUNDED
   EXPIRED
+  UNKNOWN
 }
 
 enum UserRole {
