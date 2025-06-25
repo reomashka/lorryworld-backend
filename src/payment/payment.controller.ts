@@ -51,6 +51,7 @@ export class PaymentController {
 		@Body() payload: PaymentWebhookDto
 		// @Headers('x-api-sha256-signature') signature: string
 	) {
+		console.log('Webhook received:', payload)
 		return await this.paymentService.handleWebhook(payload)
 	}
 }
