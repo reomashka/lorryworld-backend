@@ -218,15 +218,16 @@ export class PaymentService {
 					select: { balance: true }
 				})
 
+				const amountNumber = Math.round(parseFloat(payload.amount))
 				this.logger.log(
-					`🔢 Current balance: ${user?.balance}, adding: ${payment.amount}`
+					`🔢 Current balance: ${user?.balance}, adding: ${amountNumber}`
 				)
 
 				await tx.user.update({
 					where: { id: payment.userId },
 					data: {
 						balance: {
-							increment: payment.amount
+							increment: amountNumber
 						}
 					}
 				})
