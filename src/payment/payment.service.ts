@@ -185,7 +185,6 @@ export class PaymentService {
 
 		// Вся логика в транзакции
 		return await this.prismaService.$transaction(async tx => {
-			// 🔁 Повторно получаем платеж внутри транзакции
 			const payment = await tx.payment.findUnique({
 				where: { invoiceId: payload.invoice_id }
 			})
@@ -208,28 +207,10 @@ export class PaymentService {
 
 			// 💰 Если платеж успешен — пополняем баланс
 			if (statusPayment === PaymentStatus.SUCCESS) {
-				const userId = payment.userId
-
-				if (!userId) {
-					console.warn(
-						`⚠️ No userId for payment ${payload.invoice_id}`
-					)
-					return { statusPayment, data: payload }
-				}
-
-				const amountInt = Math.floor(Number(payload.amount))
-				if (isNaN(amountInt)) {
-					console.error(`❌ Invalid amount: ${payload.amount}`)
-					return { statusPayment, data: payload }
-				}
-
-				const updatedUser = await tx.user.update({
-					where: { id: userId },
-					data: { balance: { increment: amountInt } }
+				await tx.user.update({
+					where: { id: payment.userId },
+					data: { balance: { increment: payment.amount } }
 				})
-				console.log(
-					`💸 Balance updated for user ${userId}: +${amountInt}`
-				)
 			}
 
 			return { statusPayment, data: payload }
