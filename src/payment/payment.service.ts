@@ -168,6 +168,8 @@ export class PaymentService {
 	public async handleWebhook(payload: PaymentWebhookDto) {
 		let statusPayment: PaymentStatus
 
+		console.log(payload)
+
 		switch (payload.status) {
 			case 'success':
 				statusPayment =
