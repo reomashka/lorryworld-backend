@@ -183,47 +183,56 @@ export class PaymentService {
 				statusPayment = PaymentStatus.UNKNOWN
 		}
 
-		const payment = await this.prismaService.payment.findUnique({
-			where: { invoiceId: payload.invoice_id }
-		})
+		// Вся логика в транзакции
+		return await this.prismaService.$transaction(async tx => {
+			// 🔁 Повторно получаем платеж внутри транзакции
+			const payment = await tx.payment.findUnique({
+				where: { invoiceId: payload.invoice_id }
+			})
 
-		if (!payment) {
-			console.error(`❌ Payment not found: ${payload.invoice_id}`)
-			throw new Error(
-				`Payment with invoiceId ${payload.invoice_id} not found`
-			)
-		}
+			if (!payment) {
+				console.error(
+					`❌ Payment not found in tx: ${payload.invoice_id}`
+				)
+				throw new Error(
+					`Payment with invoiceId ${payload.invoice_id} not found`
+				)
+			}
 
-		// В транзакции делаем оба действия
-		await this.prismaService.$transaction(async tx => {
+			// 🧾 Обновляем статус платежа
 			await tx.payment.update({
 				where: { invoiceId: payload.invoice_id },
 				data: { status: statusPayment }
 			})
+			console.log(`✅ Payment status updated to ${statusPayment}`)
 
+			// 💰 Если платеж успешен — пополняем баланс
 			if (statusPayment === PaymentStatus.SUCCESS) {
 				const userId = payment.userId
 
 				if (!userId) {
 					console.warn(
-						`❌ No userId for payment ${payload.invoice_id}`
+						`⚠️ No userId for payment ${payload.invoice_id}`
 					)
-					return // Выходим из транзакции без обновления баланса
+					return { statusPayment, data: payload }
 				}
 
-				const amountInt = parseInt(payload.amount)
+				const amountInt = Math.floor(Number(payload.amount))
 				if (isNaN(amountInt)) {
 					console.error(`❌ Invalid amount: ${payload.amount}`)
-					return
+					return { statusPayment, data: payload }
 				}
 
-				await tx.user.update({
+				const updatedUser = await tx.user.update({
 					where: { id: userId },
 					data: { balance: { increment: amountInt } }
 				})
+				console.log(
+					`💸 Balance updated for user ${userId}: +${amountInt}`
+				)
 			}
-		})
 
-		return { statusPayment, data: payload }
+			return { statusPayment, data: payload }
+		})
 	}
 }
