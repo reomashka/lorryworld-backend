@@ -165,86 +165,95 @@ export class PaymentService {
 	}
 
 	// webhook
-	public async handleWebhook(payload: PaymentWebhookDto) {
-		let statusPayment: PaymentStatus
+	// public async handleWebhook(payload: PaymentWebhookDto) {
+	// 	let statusPayment: PaymentStatus
 
+	// 	console.log(payload)
+
+	// 	switch (payload.status) {
+	// 		case 'success':
+	// 			statusPayment =
+	// 				payload.code === 1
+	// 					? PaymentStatus.SUCCESS
+	// 					: PaymentStatus.UNKNOWN
+	// 			break
+	// 		case 'fail':
+	// 			statusPayment = [31, 32].includes(payload.code)
+	// 				? PaymentStatus.CANCELLATION
+	// 				: PaymentStatus.UNKNOWN
+	// 			break
+	// 		case 'expired':
+	// 			statusPayment = PaymentStatus.EXPIRED
+	// 			break
+	// 		case 'refund':
+	// 			statusPayment =
+	// 				payload.code === 20
+	// 					? PaymentStatus.REFUNDED
+	// 					: PaymentStatus.UNKNOWN
+	// 			break
+	// 		default:
+	// 			statusPayment = PaymentStatus.UNKNOWN
+	// 			break
+	// 	}
+
+	// 	const payment = await this.prismaService.payment.findUnique({
+	// 		where: { invoiceId: payload.invoice_id }
+	// 	})
+
+	// 	if (!payment) {
+	// 		console.error(`❌ Payment not found: ${payload.invoice_id}`)
+	// 		throw new Error(
+	// 			`Payment with invoiceId ${payload.invoice_id} not found`
+	// 		)
+	// 	}
+
+	// 	await this.prismaService.payment.update({
+	// 		where: { invoiceId: payload.invoice_id },
+	// 		data: { status: statusPayment }
+	// 	})
+
+	// 	if (statusPayment === PaymentStatus.SUCCESS) {
+	// 		const userId = payment.userId
+
+	// 		if (!userId) {
+	// 			console.warn(`❌ No userId for payment ${payload.invoice_id}`)
+	// 			return { statusPayment, data: payload }
+	// 		}
+
+	// 		const rawAmount = payload.amount?.replace(',', '.')
+	// 		const amountNumber = Number(rawAmount)
+
+	// 		if (typeof payload.amount !== 'string') {
+	// 			console.error(
+	// 				`❌ payload.amount is not string:`,
+	// 				payload.amount
+	// 			)
+	// 			return { statusPayment, data: payload }
+	// 		}
+
+	// 		try {
+	// 			const updated = await this.prismaService.user.update({
+	// 				where: { id: userId },
+	// 				data: { balance: { increment: amountNumber } }
+	// 			})
+	// 			console.log(
+	// 				`✅ Баланс пользователя ${userId} пополнен на ${amountNumber}`,
+	// 				updated
+	// 			)
+	// 		} catch (e) {
+	// 			console.error(
+	// 				`❌ Ошибка обновления баланса user #${userId}:`,
+	// 				e
+	// 			)
+	// 		}
+	// 	}
+
+	// 	return { statusPayment, data: payload }
+	// }
+
+	public async handleWebhook(payload: PaymentWebhookDto) {
 		console.log(payload)
 
-		switch (payload.status) {
-			case 'success':
-				statusPayment =
-					payload.code === 1
-						? PaymentStatus.SUCCESS
-						: PaymentStatus.UNKNOWN
-				break
-			case 'fail':
-				statusPayment = [31, 32].includes(payload.code)
-					? PaymentStatus.CANCELLATION
-					: PaymentStatus.UNKNOWN
-				break
-			case 'expired':
-				statusPayment = PaymentStatus.EXPIRED
-				break
-			case 'refund':
-				statusPayment =
-					payload.code === 20
-						? PaymentStatus.REFUNDED
-						: PaymentStatus.UNKNOWN
-				break
-			default:
-				statusPayment = PaymentStatus.UNKNOWN
-				break
-		}
-
-		const payment = await this.prismaService.payment.findUnique({
-			where: { invoiceId: payload.invoice_id }
-		})
-
-		if (!payment) {
-			console.error(`❌ Payment not found: ${payload.invoice_id}`)
-			throw new Error(
-				`Payment with invoiceId ${payload.invoice_id} not found`
-			)
-		}
-
-		await this.prismaService.payment.update({
-			where: { invoiceId: payload.invoice_id },
-			data: { status: statusPayment }
-		})
-
-		if (statusPayment === PaymentStatus.SUCCESS) {
-			const userId = payment.userId
-
-			if (!userId) {
-				console.warn(`❌ No userId for payment ${payload.invoice_id}`)
-				return { statusPayment, data: payload }
-			}
-
-			const rawAmount = payload.amount?.replace(',', '.')
-			const amountNumber = Number(rawAmount)
-
-			if (!rawAmount || isNaN(amountNumber)) {
-				console.error(`❌ Invalid amount: ${payload.amount}`)
-				return { statusPayment, data: payload }
-			}
-
-			try {
-				const updated = await this.prismaService.user.update({
-					where: { id: userId },
-					data: { balance: { increment: amountNumber } }
-				})
-				console.log(
-					`✅ Баланс пользователя ${userId} пополнен на ${amountNumber}`,
-					updated
-				)
-			} catch (e) {
-				console.error(
-					`❌ Ошибка обновления баланса user #${userId}:`,
-					e
-				)
-			}
-		}
-
-		return { statusPayment, data: payload }
+		return { data: payload }
 	}
 }
