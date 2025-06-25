@@ -31,6 +31,8 @@ services:
                 ]
             interval: 10s
             retries: 5
+        tty: true
+        stdin_open: true
 
     postgres:
         container_name: postgres

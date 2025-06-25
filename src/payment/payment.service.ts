@@ -1,4 +1,5 @@
 import { BadRequestException, Injectable } from '@nestjs/common'
+import { Logger } from '@nestjs/common'
 import { ConfigService } from '@nestjs/config'
 import { PaymentStatus, PaymentType } from '@prisma/__generated__'
 import { v4 as uuidv4 } from 'uuid'
@@ -15,6 +16,7 @@ export class PaymentService {
 		private readonly configService: ConfigService,
 		private readonly prismaService: PrismaService
 	) {}
+	private readonly logger = new Logger(PaymentService.name)
 
 	public async createPayment(dto: PaymentDto) {
 		const PAYMENT_URL = 'https://api.morune.com/invoice/create'
@@ -91,7 +93,7 @@ export class PaymentService {
 		}).toString()
 
 		const urlWithParams = `${PAYMENT_URL}?${queryParams}`
-		console.log(urlWithParams)
+		this.logger.log(urlWithParams)
 
 		try {
 			const response = await fetch(urlWithParams, {
@@ -126,6 +128,7 @@ export class PaymentService {
 	}
 
 	async updatePaymentStatus(payload) {
+		this.logger.log(`Payload received: ${JSON.stringify(payload)}`)
 		if (payload.code === 1) {
 			const paymentUpdate = await this.prismaService.payment.update({
 				where: {
@@ -191,7 +194,7 @@ export class PaymentService {
 			})
 
 			if (!payment) {
-				console.error(
+				this.logger.error(
 					`❌ Payment not found in tx: ${payload.invoice_id}`
 				)
 				throw new Error(
@@ -204,13 +207,26 @@ export class PaymentService {
 				where: { invoiceId: payload.invoice_id },
 				data: { status: statusPayment }
 			})
-			console.log(`✅ Payment status updated to ${statusPayment}`)
+			this.logger.log(`✅ Payment status updated to ${statusPayment}`)
 
 			// 💰 Если платеж успешен — пополняем баланс
 			if (statusPayment === PaymentStatus.SUCCESS) {
+				const user = await tx.user.findUnique({
+					where: { id: payment.userId },
+					select: { balance: true }
+				})
+
+				this.logger.log(
+					`🔢 Current balance: ${user?.balance}, adding: ${payment.amount}`
+				)
+
 				await tx.user.update({
 					where: { id: payment.userId },
-					data: { balance: { increment: payment.amount } }
+					data: {
+						balance: {
+							increment: payment.amount
+						}
+					}
 				})
 			}
 
