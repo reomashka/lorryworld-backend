@@ -53,13 +53,14 @@ export class PaymentService {
 					`HTTP error! status: ${response.status}`
 				)
 			}
+			const amountInt = Math.floor(Number(dto.amount))
 
 			const payment = await this.prismaService.payment.create({
 				data: {
 					id: orderId,
 					invoiceId: result.data.id,
 					userId: dto.userId,
-					amount: dto.amount,
+					amount: amountInt,
 					status: PaymentStatus.PENDING,
 					type: PaymentType.DEPOSIT,
 					currency: 'RUB',
