@@ -218,7 +218,7 @@ export class PaymentService {
 					select: { balance: true }
 				})
 
-				const amountNumber = Math.round(parseFloat(payload.amount))
+				const amountNumber = Math.ceil(parseFloat(payload.amount))
 				this.logger.log(
 					`🔢 Current balance: ${user?.balance}, adding: ${amountNumber}`
 				)
