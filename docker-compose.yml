@@ -13,7 +13,7 @@ services:
             - postgres
             - redis
         volumes:
-            - .:/app
+            # - .:/app
             - /app/node_modules
         networks:
             - shared_net
