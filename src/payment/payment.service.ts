@@ -158,8 +158,6 @@ export class PaymentService {
 	public async handleWebhook(payload: PaymentWebhookDto) {
 		let statusPayment: PaymentStatus
 
-		console.log(payload)
-
 		switch (payload.status) {
 			case 'success':
 				statusPayment =
@@ -183,7 +181,6 @@ export class PaymentService {
 				break
 			default:
 				statusPayment = PaymentStatus.UNKNOWN
-				break
 		}
 
 		const payment = await this.prismaService.payment.findUnique({
@@ -197,31 +194,35 @@ export class PaymentService {
 			)
 		}
 
-		await this.prismaService.payment.update({
-			where: { invoiceId: payload.invoice_id },
-			data: { status: statusPayment }
-		})
-
-		if (statusPayment === PaymentStatus.SUCCESS) {
-			const userId = payment.userId
-
-			if (!userId) {
-				console.warn(`❌ No userId for payment ${payload.invoice_id}`)
-				return { statusPayment, data: payload }
-			}
-
-			const amountInt = parseInt(payload.amount)
-
-			if (isNaN(amountInt)) {
-				console.error(`❌ Invalid amount: ${payload.amount}`)
-				return { statusPayment, data: payload }
-			}
-
-			await this.prismaService.user.update({
-				where: { id: userId },
-				data: { balance: { increment: amountInt } }
+		// В транзакции делаем оба действия
+		await this.prismaService.$transaction(async tx => {
+			await tx.payment.update({
+				where: { invoiceId: payload.invoice_id },
+				data: { status: statusPayment }
 			})
-		}
+
+			if (statusPayment === PaymentStatus.SUCCESS) {
+				const userId = payment.userId
+
+				if (!userId) {
+					console.warn(
+						`❌ No userId for payment ${payload.invoice_id}`
+					)
+					return // Выходим из транзакции без обновления баланса
+				}
+
+				const amountInt = parseInt(payload.amount)
+				if (isNaN(amountInt)) {
+					console.error(`❌ Invalid amount: ${payload.amount}`)
+					return
+				}
+
+				await tx.user.update({
+					where: { id: userId },
+					data: { balance: { increment: amountInt } }
+				})
+			}
+		})
 
 		return { statusPayment, data: payload }
 	}
