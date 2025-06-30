@@ -13,24 +13,11 @@ services:
             - postgres
             - redis
         volumes:
-            # - .:/app
             - /app/node_modules
         networks:
             - shared_net
             - backend_network
         restart: always
-        healthcheck:
-            test:
-                [
-                    'CMD',
-                    'pg_isready',
-                    '-U',
-                    '${POSTGRES_USER}',
-                    '-d',
-                    '${POSTGRES_DB}'
-                ]
-            interval: 10s
-            retries: 5
         tty: true
         stdin_open: true
 
