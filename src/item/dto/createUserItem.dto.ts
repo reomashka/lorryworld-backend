@@ -1,4 +1,4 @@
-import { IsInt, IsNotEmpty, IsString, IsUUID } from 'class-validator'
+import { IsInt, IsNotEmpty, IsString } from 'class-validator'
 
 export class CreateUserItemDto {
 	@IsInt()
@@ -6,7 +6,6 @@ export class CreateUserItemDto {
 	quantity: number
 
 	@IsString()
-	@IsUUID()
 	@IsNotEmpty()
 	userId: string
 
