@@ -14,6 +14,7 @@ services:
             - redis
         volumes:
             - /app/node_modules
+            - ./uploads:/app/uploads
         networks:
             - shared_net
             - backend_network
