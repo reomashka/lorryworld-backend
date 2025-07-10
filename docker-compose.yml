@@ -8,7 +8,6 @@ services:
             - '3001:3000'
         env_file:
             - .env
-            - .env.docker
         depends_on:
             - postgres
             - redis
