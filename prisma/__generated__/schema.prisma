@@ -75,6 +75,7 @@ model Item {
   id           Int        @id @default(autoincrement())
   name         String
   price        Int
+  sale         Int?
   availability Boolean    @default(true)
   type         ItemType
   icon         String

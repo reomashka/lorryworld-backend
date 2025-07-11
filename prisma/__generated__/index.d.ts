@@ -5979,17 +5979,20 @@ export namespace Prisma {
   export type ItemAvgAggregateOutputType = {
     id: number | null
     price: number | null
+    sale: number | null
   }
 
   export type ItemSumAggregateOutputType = {
     id: number | null
     price: number | null
+    sale: number | null
   }
 
   export type ItemMinAggregateOutputType = {
     id: number | null
     name: string | null
     price: number | null
+    sale: number | null
     availability: boolean | null
     type: $Enums.ItemType | null
     icon: string | null
@@ -6002,6 +6005,7 @@ export namespace Prisma {
     id: number | null
     name: string | null
     price: number | null
+    sale: number | null
     availability: boolean | null
     type: $Enums.ItemType | null
     icon: string | null
@@ -6014,6 +6018,7 @@ export namespace Prisma {
     id: number
     name: number
     price: number
+    sale: number
     availability: number
     type: number
     icon: number
@@ -6027,17 +6032,20 @@ export namespace Prisma {
   export type ItemAvgAggregateInputType = {
     id?: true
     price?: true
+    sale?: true
   }
 
   export type ItemSumAggregateInputType = {
     id?: true
     price?: true
+    sale?: true
   }
 
   export type ItemMinAggregateInputType = {
     id?: true
     name?: true
     price?: true
+    sale?: true
     availability?: true
     type?: true
     icon?: true
@@ -6050,6 +6058,7 @@ export namespace Prisma {
     id?: true
     name?: true
     price?: true
+    sale?: true
     availability?: true
     type?: true
     icon?: true
@@ -6062,6 +6071,7 @@ export namespace Prisma {
     id?: true
     name?: true
     price?: true
+    sale?: true
     availability?: true
     type?: true
     icon?: true
@@ -6161,6 +6171,7 @@ export namespace Prisma {
     id: number
     name: string
     price: number
+    sale: number | null
     availability: boolean
     type: $Enums.ItemType
     icon: string
@@ -6192,6 +6203,7 @@ export namespace Prisma {
     id?: boolean
     name?: boolean
     price?: boolean
+    sale?: boolean
     availability?: boolean
     type?: boolean
     icon?: boolean
@@ -6206,6 +6218,7 @@ export namespace Prisma {
     id?: boolean
     name?: boolean
     price?: boolean
+    sale?: boolean
     availability?: boolean
     type?: boolean
     icon?: boolean
@@ -6218,6 +6231,7 @@ export namespace Prisma {
     id?: boolean
     name?: boolean
     price?: boolean
+    sale?: boolean
     availability?: boolean
     type?: boolean
     icon?: boolean
@@ -6230,6 +6244,7 @@ export namespace Prisma {
     id?: boolean
     name?: boolean
     price?: boolean
+    sale?: boolean
     availability?: boolean
     type?: boolean
     icon?: boolean
@@ -6238,7 +6253,7 @@ export namespace Prisma {
     rarity?: boolean
   }
 
-  export type ItemOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "name" | "price" | "availability" | "type" | "icon" | "description" | "game" | "rarity", ExtArgs["result"]["item"]>
+  export type ItemOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "name" | "price" | "sale" | "availability" | "type" | "icon" | "description" | "game" | "rarity", ExtArgs["result"]["item"]>
   export type ItemInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     users?: boolean | Item$usersArgs<ExtArgs>
     _count?: boolean | ItemCountOutputTypeDefaultArgs<ExtArgs>
@@ -6255,6 +6270,7 @@ export namespace Prisma {
       id: number
       name: string
       price: number
+      sale: number | null
       availability: boolean
       type: $Enums.ItemType
       icon: string
@@ -6688,6 +6704,7 @@ export namespace Prisma {
     readonly id: FieldRef<"Item", 'Int'>
     readonly name: FieldRef<"Item", 'String'>
     readonly price: FieldRef<"Item", 'Int'>
+    readonly sale: FieldRef<"Item", 'Int'>
     readonly availability: FieldRef<"Item", 'Boolean'>
     readonly type: FieldRef<"Item", 'ItemType'>
     readonly icon: FieldRef<"Item", 'String'>
@@ -7202,6 +7219,7 @@ export namespace Prisma {
     id: 'id',
     name: 'name',
     price: 'price',
+    sale: 'sale',
     availability: 'availability',
     type: 'type',
     icon: 'icon',
@@ -7750,6 +7768,7 @@ export namespace Prisma {
     id?: IntFilter<"Item"> | number
     name?: StringFilter<"Item"> | string
     price?: IntFilter<"Item"> | number
+    sale?: IntNullableFilter<"Item"> | number | null
     availability?: BoolFilter<"Item"> | boolean
     type?: EnumItemTypeFilter<"Item"> | $Enums.ItemType
     icon?: StringFilter<"Item"> | string
@@ -7763,6 +7782,7 @@ export namespace Prisma {
     id?: SortOrder
     name?: SortOrder
     price?: SortOrder
+    sale?: SortOrderInput | SortOrder
     availability?: SortOrder
     type?: SortOrder
     icon?: SortOrder
@@ -7779,6 +7799,7 @@ export namespace Prisma {
     NOT?: ItemWhereInput | ItemWhereInput[]
     name?: StringFilter<"Item"> | string
     price?: IntFilter<"Item"> | number
+    sale?: IntNullableFilter<"Item"> | number | null
     availability?: BoolFilter<"Item"> | boolean
     type?: EnumItemTypeFilter<"Item"> | $Enums.ItemType
     icon?: StringFilter<"Item"> | string
@@ -7792,6 +7813,7 @@ export namespace Prisma {
     id?: SortOrder
     name?: SortOrder
     price?: SortOrder
+    sale?: SortOrderInput | SortOrder
     availability?: SortOrder
     type?: SortOrder
     icon?: SortOrder
@@ -7812,6 +7834,7 @@ export namespace Prisma {
     id?: IntWithAggregatesFilter<"Item"> | number
     name?: StringWithAggregatesFilter<"Item"> | string
     price?: IntWithAggregatesFilter<"Item"> | number
+    sale?: IntNullableWithAggregatesFilter<"Item"> | number | null
     availability?: BoolWithAggregatesFilter<"Item"> | boolean
     type?: EnumItemTypeWithAggregatesFilter<"Item"> | $Enums.ItemType
     icon?: StringWithAggregatesFilter<"Item"> | string
@@ -8164,6 +8187,7 @@ export namespace Prisma {
   export type ItemCreateInput = {
     name: string
     price: number
+    sale?: number | null
     availability?: boolean
     type: $Enums.ItemType
     icon: string
@@ -8177,6 +8201,7 @@ export namespace Prisma {
     id?: number
     name: string
     price: number
+    sale?: number | null
     availability?: boolean
     type: $Enums.ItemType
     icon: string
@@ -8189,6 +8214,7 @@ export namespace Prisma {
   export type ItemUpdateInput = {
     name?: StringFieldUpdateOperationsInput | string
     price?: IntFieldUpdateOperationsInput | number
+    sale?: NullableIntFieldUpdateOperationsInput | number | null
     availability?: BoolFieldUpdateOperationsInput | boolean
     type?: EnumItemTypeFieldUpdateOperationsInput | $Enums.ItemType
     icon?: StringFieldUpdateOperationsInput | string
@@ -8202,6 +8228,7 @@ export namespace Prisma {
     id?: IntFieldUpdateOperationsInput | number
     name?: StringFieldUpdateOperationsInput | string
     price?: IntFieldUpdateOperationsInput | number
+    sale?: NullableIntFieldUpdateOperationsInput | number | null
     availability?: BoolFieldUpdateOperationsInput | boolean
     type?: EnumItemTypeFieldUpdateOperationsInput | $Enums.ItemType
     icon?: StringFieldUpdateOperationsInput | string
@@ -8215,6 +8242,7 @@ export namespace Prisma {
     id?: number
     name: string
     price: number
+    sale?: number | null
     availability?: boolean
     type: $Enums.ItemType
     icon: string
@@ -8226,6 +8254,7 @@ export namespace Prisma {
   export type ItemUpdateManyMutationInput = {
     name?: StringFieldUpdateOperationsInput | string
     price?: IntFieldUpdateOperationsInput | number
+    sale?: NullableIntFieldUpdateOperationsInput | number | null
     availability?: BoolFieldUpdateOperationsInput | boolean
     type?: EnumItemTypeFieldUpdateOperationsInput | $Enums.ItemType
     icon?: StringFieldUpdateOperationsInput | string
@@ -8238,6 +8267,7 @@ export namespace Prisma {
     id?: IntFieldUpdateOperationsInput | number
     name?: StringFieldUpdateOperationsInput | string
     price?: IntFieldUpdateOperationsInput | number
+    sale?: NullableIntFieldUpdateOperationsInput | number | null
     availability?: BoolFieldUpdateOperationsInput | boolean
     type?: EnumItemTypeFieldUpdateOperationsInput | $Enums.ItemType
     icon?: StringFieldUpdateOperationsInput | string
@@ -8728,6 +8758,17 @@ export namespace Prisma {
     _max?: NestedEnumPaymentStatusFilter<$PrismaModel>
   }
 
+  export type IntNullableFilter<$PrismaModel = never> = {
+    equals?: number | IntFieldRefInput<$PrismaModel> | null
+    in?: number[] | ListIntFieldRefInput<$PrismaModel> | null
+    notIn?: number[] | ListIntFieldRefInput<$PrismaModel> | null
+    lt?: number | IntFieldRefInput<$PrismaModel>
+    lte?: number | IntFieldRefInput<$PrismaModel>
+    gt?: number | IntFieldRefInput<$PrismaModel>
+    gte?: number | IntFieldRefInput<$PrismaModel>
+    not?: NestedIntNullableFilter<$PrismaModel> | number | null
+  }
+
   export type EnumItemTypeFilter<$PrismaModel = never> = {
     equals?: $Enums.ItemType | EnumItemTypeFieldRefInput<$PrismaModel>
     in?: $Enums.ItemType[] | ListEnumItemTypeFieldRefInput<$PrismaModel>
@@ -8746,6 +8787,7 @@ export namespace Prisma {
     id?: SortOrder
     name?: SortOrder
     price?: SortOrder
+    sale?: SortOrder
     availability?: SortOrder
     type?: SortOrder
     icon?: SortOrder
@@ -8757,12 +8799,14 @@ export namespace Prisma {
   export type ItemAvgOrderByAggregateInput = {
     id?: SortOrder
     price?: SortOrder
+    sale?: SortOrder
   }
 
   export type ItemMaxOrderByAggregateInput = {
     id?: SortOrder
     name?: SortOrder
     price?: SortOrder
+    sale?: SortOrder
     availability?: SortOrder
     type?: SortOrder
     icon?: SortOrder
@@ -8775,6 +8819,7 @@ export namespace Prisma {
     id?: SortOrder
     name?: SortOrder
     price?: SortOrder
+    sale?: SortOrder
     availability?: SortOrder
     type?: SortOrder
     icon?: SortOrder
@@ -8786,6 +8831,23 @@ export namespace Prisma {
   export type ItemSumOrderByAggregateInput = {
     id?: SortOrder
     price?: SortOrder
+    sale?: SortOrder
+  }
+
+  export type IntNullableWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: number | IntFieldRefInput<$PrismaModel> | null
+    in?: number[] | ListIntFieldRefInput<$PrismaModel> | null
+    notIn?: number[] | ListIntFieldRefInput<$PrismaModel> | null
+    lt?: number | IntFieldRefInput<$PrismaModel>
+    lte?: number | IntFieldRefInput<$PrismaModel>
+    gt?: number | IntFieldRefInput<$PrismaModel>
+    gte?: number | IntFieldRefInput<$PrismaModel>
+    not?: NestedIntNullableWithAggregatesFilter<$PrismaModel> | number | null
+    _count?: NestedIntNullableFilter<$PrismaModel>
+    _avg?: NestedFloatNullableFilter<$PrismaModel>
+    _sum?: NestedIntNullableFilter<$PrismaModel>
+    _min?: NestedIntNullableFilter<$PrismaModel>
+    _max?: NestedIntNullableFilter<$PrismaModel>
   }
 
   export type EnumItemTypeWithAggregatesFilter<$PrismaModel = never> = {
@@ -9002,6 +9064,14 @@ export namespace Prisma {
     connectOrCreate?: UserItemCreateOrConnectWithoutItemInput | UserItemCreateOrConnectWithoutItemInput[]
     createMany?: UserItemCreateManyItemInputEnvelope
     connect?: UserItemWhereUniqueInput | UserItemWhereUniqueInput[]
+  }
+
+  export type NullableIntFieldUpdateOperationsInput = {
+    set?: number | null
+    increment?: number
+    decrement?: number
+    multiply?: number
+    divide?: number
   }
 
   export type EnumItemTypeFieldUpdateOperationsInput = {
@@ -9347,6 +9417,33 @@ export namespace Prisma {
     not?: NestedEnumItemRarityFilter<$PrismaModel> | $Enums.ItemRarity
   }
 
+  export type NestedIntNullableWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: number | IntFieldRefInput<$PrismaModel> | null
+    in?: number[] | ListIntFieldRefInput<$PrismaModel> | null
+    notIn?: number[] | ListIntFieldRefInput<$PrismaModel> | null
+    lt?: number | IntFieldRefInput<$PrismaModel>
+    lte?: number | IntFieldRefInput<$PrismaModel>
+    gt?: number | IntFieldRefInput<$PrismaModel>
+    gte?: number | IntFieldRefInput<$PrismaModel>
+    not?: NestedIntNullableWithAggregatesFilter<$PrismaModel> | number | null
+    _count?: NestedIntNullableFilter<$PrismaModel>
+    _avg?: NestedFloatNullableFilter<$PrismaModel>
+    _sum?: NestedIntNullableFilter<$PrismaModel>
+    _min?: NestedIntNullableFilter<$PrismaModel>
+    _max?: NestedIntNullableFilter<$PrismaModel>
+  }
+
+  export type NestedFloatNullableFilter<$PrismaModel = never> = {
+    equals?: number | FloatFieldRefInput<$PrismaModel> | null
+    in?: number[] | ListFloatFieldRefInput<$PrismaModel> | null
+    notIn?: number[] | ListFloatFieldRefInput<$PrismaModel> | null
+    lt?: number | FloatFieldRefInput<$PrismaModel>
+    lte?: number | FloatFieldRefInput<$PrismaModel>
+    gt?: number | FloatFieldRefInput<$PrismaModel>
+    gte?: number | FloatFieldRefInput<$PrismaModel>
+    not?: NestedFloatNullableFilter<$PrismaModel> | number | null
+  }
+
   export type NestedEnumItemTypeWithAggregatesFilter<$PrismaModel = never> = {
     equals?: $Enums.ItemType | EnumItemTypeFieldRefInput<$PrismaModel>
     in?: $Enums.ItemType[] | ListEnumItemTypeFieldRefInput<$PrismaModel>
@@ -9533,6 +9630,7 @@ export namespace Prisma {
   export type ItemCreateWithoutUsersInput = {
     name: string
     price: number
+    sale?: number | null
     availability?: boolean
     type: $Enums.ItemType
     icon: string
@@ -9545,6 +9643,7 @@ export namespace Prisma {
     id?: number
     name: string
     price: number
+    sale?: number | null
     availability?: boolean
     type: $Enums.ItemType
     icon: string
@@ -9615,6 +9714,7 @@ export namespace Prisma {
   export type ItemUpdateWithoutUsersInput = {
     name?: StringFieldUpdateOperationsInput | string
     price?: IntFieldUpdateOperationsInput | number
+    sale?: NullableIntFieldUpdateOperationsInput | number | null
     availability?: BoolFieldUpdateOperationsInput | boolean
     type?: EnumItemTypeFieldUpdateOperationsInput | $Enums.ItemType
     icon?: StringFieldUpdateOperationsInput | string
@@ -9627,6 +9727,7 @@ export namespace Prisma {
     id?: IntFieldUpdateOperationsInput | number
     name?: StringFieldUpdateOperationsInput | string
     price?: IntFieldUpdateOperationsInput | number
+    sale?: NullableIntFieldUpdateOperationsInput | number | null
     availability?: BoolFieldUpdateOperationsInput | boolean
     type?: EnumItemTypeFieldUpdateOperationsInput | $Enums.ItemType
     icon?: StringFieldUpdateOperationsInput | string
