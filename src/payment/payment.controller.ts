@@ -2,15 +2,11 @@ import {
 	Body,
 	Controller,
 	Get,
-	Headers,
 	HttpCode,
 	HttpStatus,
 	Param,
-	Post,
-	Req,
-	Res
+	Post
 } from '@nestjs/common'
-import { Request, Response } from 'express'
 
 import { PaymentDto } from './dto/payment.dto'
 import { PaymentWebhookDto } from './dto/paymentWebhook.dto'
@@ -32,14 +28,6 @@ export class PaymentController {
 		return this.paymentService.getInfoOfPayment(invoiceId)
 	}
 
-	// @Post('webhook')
-	// public async handleWebhook(
-	// 	@Headers('x-api-sha256-signature') signature: string,
-	// 	@Body() payload: any
-	// ) {
-	// 	return this.paymentService.updatePaymentStatus(payload)
-	// }
-
 	@Get('get-payments/:userId')
 	public async getPaymentsOfUser(@Param('userId') userId: string) {
 		return this.paymentService.getPaymentsOfUser(userId)
@@ -47,10 +35,7 @@ export class PaymentController {
 
 	@Post('webhook')
 	@HttpCode(HttpStatus.OK)
-	public async handle(
-		@Body() payload: PaymentWebhookDto
-		// @Headers('x-api-sha256-signature') signature: string
-	) {
+	public async handle(@Body() payload: PaymentWebhookDto) {
 		return await this.paymentService.handleWebhook(payload)
 	}
 }
