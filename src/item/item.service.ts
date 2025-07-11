@@ -50,7 +50,11 @@ export class ItemService {
 		if (!item || !user) {
 			throw new NotFoundException('user or item not found')
 		}
-		if (user.balance < item.price) {
+
+		const priceToUse = item.sale > 0 ? item.sale : item.price
+		const totalPrice = priceToUse * dto.quantity
+
+		if (user.balance < totalPrice) {
 			throw new BadRequestException('Недостаточно средств на балансе.')
 		}
 
@@ -60,7 +64,7 @@ export class ItemService {
 					id: dto.userId
 				},
 				data: {
-					balance: { decrement: item.price * dto.quantity }
+					balance: { decrement: totalPrice }
 				}
 			}),
 
