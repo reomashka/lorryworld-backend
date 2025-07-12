@@ -1,7 +1,4 @@
-import { Injectable } from '@nestjs/common'
-import { PaymentStatus } from '@prisma/__generated__'
-
-import { PrismaService } from '@/prisma/prisma.service'
+import { ItemStatus, PaymentStatus } from '@prisma/__generated__'
 
 @Injectable()
 export class AdminService {
@@ -22,48 +19,62 @@ export class AdminService {
 		}
 	}
 
-	public async getAllEarnings() {
+	private async getAggregateSums(
+		model: 'payment' | 'userItem',
+		where: object
+	) {
+		const prismaModel =
+			model === 'payment'
+				? this.prismaService.payment
+				: this.prismaService.userItem
+
 		const { startOfToday, startOfYesterday, startOfWeek } =
 			this.getEarningsDateRanges()
 
 		const [today, yesterday, week] = await Promise.all([
-			this.prismaService.payment.aggregate({
+			prismaModel.aggregate({
 				_sum: { amount: true },
 				where: {
-					status: PaymentStatus.SUCCESS,
+					...where,
 					createdAt: { gte: startOfToday }
 				}
 			}),
-			this.prismaService.payment.aggregate({
+			prismaModel.aggregate({
 				_sum: { amount: true },
 				where: {
-					status: PaymentStatus.SUCCESS,
+					...where,
 					createdAt: {
 						gte: startOfYesterday,
 						lt: startOfToday
 					}
 				}
 			}),
-			this.prismaService.payment.aggregate({
+			prismaModel.aggregate({
 				_sum: { amount: true },
 				where: {
-					status: PaymentStatus.SUCCESS,
+					...where,
 					createdAt: { gte: startOfWeek }
 				}
 			})
 		])
 
 		return {
-			earnings: {
-				today: today._sum.amount || 0,
-				yesterday: yesterday._sum.amount || 0,
-				week: week._sum.amount || 0
-			},
-			items: {
-				today: today._sum.amount || 0,
-				yesterday: yesterday._sum.amount || 0,
-				week: week._sum.amount || 0
-			}
+			today: today._sum.amount || 0,
+			yesterday: yesterday._sum.amount || 0,
+			week: week._sum.amount || 0
 		}
+	}
+
+	public async getDashboardStats() {
+		const earnings = await this.getAggregateSums('payment', {
+			status: PaymentStatus.SUCCESS
+		})
+
+		const items = await this.getAggregateSums('userItem', {
+			status: ItemStatus.WITHDRAWN,
+			isIssued: true
+		})
+
+		return { earnings, items }
 	}
 }
