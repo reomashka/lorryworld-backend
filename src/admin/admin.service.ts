@@ -63,16 +63,16 @@ export class AdminService {
 				week: week._sum.amount || 0
 			}
 		} else {
-			const [today, yesterday, week] = await Promise.all([
+			const [todayCount, yesterdayCount, weekCount] = await Promise.all([
 				this.prismaService.userItem.aggregate({
-					_sum: { amount: true },
+					_count: true,
 					where: {
 						...where,
 						createdAt: { gte: startOfToday }
 					}
 				}),
 				this.prismaService.userItem.aggregate({
-					_sum: { amount: true },
+					_count: true,
 					where: {
 						...where,
 						createdAt: {
@@ -82,7 +82,7 @@ export class AdminService {
 					}
 				}),
 				this.prismaService.userItem.aggregate({
-					_sum: { amount: true },
+					_count: true,
 					where: {
 						...where,
 						createdAt: { gte: startOfWeek }
@@ -91,9 +91,9 @@ export class AdminService {
 			])
 
 			return {
-				today: today._sum.amount || 0,
-				yesterday: yesterday._sum.amount || 0,
-				week: week._sum.amount || 0
+				today: todayCount._count || 0,
+				yesterday: yesterdayCount._count || 0,
+				week: weekCount._count || 0
 			}
 		}
 	}
