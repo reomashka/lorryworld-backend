@@ -1,4 +1,7 @@
+import { Injectable } from '@nestjs/common'
 import { ItemStatus, PaymentStatus } from '@prisma/__generated__'
+
+import { PrismaService } from '@/prisma/prisma.service'
 
 @Injectable()
 export class AdminService {
@@ -23,45 +26,75 @@ export class AdminService {
 		model: 'payment' | 'userItem',
 		where: object
 	) {
-		const prismaModel =
-			model === 'payment'
-				? this.prismaService.payment
-				: this.prismaService.userItem
-
 		const { startOfToday, startOfYesterday, startOfWeek } =
 			this.getEarningsDateRanges()
 
-		const [today, yesterday, week] = await Promise.all([
-			prismaModel.aggregate({
-				_sum: { amount: true },
-				where: {
-					...where,
-					createdAt: { gte: startOfToday }
-				}
-			}),
-			prismaModel.aggregate({
-				_sum: { amount: true },
-				where: {
-					...where,
-					createdAt: {
-						gte: startOfYesterday,
-						lt: startOfToday
+		if (model === 'payment') {
+			const [today, yesterday, week] = await Promise.all([
+				this.prismaService.payment.aggregate({
+					_sum: { amount: true },
+					where: {
+						...where,
+						createdAt: { gte: startOfToday }
 					}
-				}
-			}),
-			prismaModel.aggregate({
-				_sum: { amount: true },
-				where: {
-					...where,
-					createdAt: { gte: startOfWeek }
-				}
-			})
-		])
+				}),
+				this.prismaService.payment.aggregate({
+					_sum: { amount: true },
+					where: {
+						...where,
+						createdAt: {
+							gte: startOfYesterday,
+							lt: startOfToday
+						}
+					}
+				}),
+				this.prismaService.payment.aggregate({
+					_sum: { amount: true },
+					where: {
+						...where,
+						createdAt: { gte: startOfWeek }
+					}
+				})
+			])
 
-		return {
-			today: today._sum.amount || 0,
-			yesterday: yesterday._sum.amount || 0,
-			week: week._sum.amount || 0
+			return {
+				today: today._sum.amount || 0,
+				yesterday: yesterday._sum.amount || 0,
+				week: week._sum.amount || 0
+			}
+		} else {
+			const [today, yesterday, week] = await Promise.all([
+				this.prismaService.userItem.aggregate({
+					_sum: { amount: true },
+					where: {
+						...where,
+						createdAt: { gte: startOfToday }
+					}
+				}),
+				this.prismaService.userItem.aggregate({
+					_sum: { amount: true },
+					where: {
+						...where,
+						createdAt: {
+							gte: startOfYesterday,
+							lt: startOfToday
+						}
+					}
+				}),
+				this.prismaService.userItem.aggregate({
+					_sum: { amount: true },
+					where: {
+						...where,
+						createdAt: { gte: startOfWeek }
+					}
+				})
+			])
+
+			return {
+				today: today._sum.amount || 0,
+				yesterday: yesterday._sum.amount || 0,
+				week: week._sum.amount || 0
+			}
 		}
 	}
 

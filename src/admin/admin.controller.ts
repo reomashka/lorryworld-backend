@@ -8,6 +8,6 @@ export class AdminController {
 
 	@Get('stats')
 	public async getAllEarnings() {
-		return this.adminService.getAllEarnings()
+		return this.adminService.getDashboardStats()
 	}
 }
