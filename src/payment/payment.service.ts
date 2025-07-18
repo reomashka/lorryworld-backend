@@ -182,22 +182,26 @@ export class PaymentService {
 		switch (payload.status) {
 			case 'success':
 				statusPayment =
-					payload.code === 1
+					payload.status === 'success'
 						? PaymentStatus.SUCCESS
 						: PaymentStatus.UNKNOWN
 				break
-			case 'fail':
-				statusPayment = [31, 32].includes(payload.code)
-					? PaymentStatus.CANCELLATION
-					: PaymentStatus.UNKNOWN
-				break
-			case 'expired':
-				statusPayment = PaymentStatus.EXPIRED
-				break
-			case 'refund':
+			case 'error':
 				statusPayment =
-					payload.code === 20
-						? PaymentStatus.REFUNDED
+					payload.status === 'error'
+						? PaymentStatus.CANCELLATION
+						: PaymentStatus.UNKNOWN
+				break
+			case 'cancel':
+				statusPayment =
+					payload.status === 'cancel'
+						? PaymentStatus.CANCELLATION
+						: PaymentStatus.UNKNOWN
+				break
+			case 'pending':
+				statusPayment =
+					payload.status === 'pending'
+						? PaymentStatus.PENDING
 						: PaymentStatus.UNKNOWN
 				break
 			default:

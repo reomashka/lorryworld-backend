@@ -1,22 +1,23 @@
-export type PaymentStatus = 'success' | 'fail' | 'expired' | 'refund'
+export type PaymentStatus = 'success' | 'pending' | 'cancel' | 'error'
 
 export class PaymentWebhookDto {
 	invoice_id: string
-	status: PaymentStatus
-	amount: string
-	currency: string
 	order_id: string
-	custom_fields: string
-	type: number
-	code: number
+	status: PaymentStatus
+	pay_time: string
+	amount: string
+	credited: number
 
-	// Optional fields
-	credited?: number
-	pay_time?: string
 	pay_service?: string
 	payer_details?: string
+
+	// Optional fields
 	reject_time?: string
 	refund_amount?: string
 	refund_reason?: string | null
 	refund_time?: string
+	currency?: string
+	custom_fields?: string
+	type?: number
+	code?: number
 }
