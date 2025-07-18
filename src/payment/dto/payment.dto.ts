@@ -5,7 +5,7 @@ export class PaymentDto {
 	@IsNotEmpty({ message: 'userId обязателен для заполнения.' })
 	userId: string
 
-	@IsNumber({}, { message: 'amount должно быть числом.' })
-	@IsNotEmpty({ message: 'amount обязателен для заполнения.' })
-	amount: number
+	@IsNumber({}, { message: 'sum должно быть числом.' })
+	@IsNotEmpty({ message: 'sum обязателен для заполнения.' })
+	sum: number
 }

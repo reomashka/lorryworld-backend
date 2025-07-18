@@ -2,6 +2,7 @@ import { BadRequestException, Injectable } from '@nestjs/common'
 import { Logger } from '@nestjs/common'
 import { ConfigService } from '@nestjs/config'
 import { PaymentStatus, PaymentType } from '@prisma/__generated__'
+import { createHmac } from 'crypto'
 import { v4 as uuidv4 } from 'uuid'
 
 import { PrismaService } from '@/prisma/prisma.service'
@@ -18,33 +19,40 @@ export class PaymentService {
 	) {}
 	private readonly logger = new Logger(PaymentService.name)
 
-	public async createPayment(dto: PaymentDto) {
-		const PAYMENT_URL = 'https://api.morune.com/invoice/create'
-		const MoruneShopId =
-			this.configService.getOrThrow<string>('MORUNE_SHOP_ID')
+	private async generateSignature(payload: string) {
+		const secret = this.configService.getOrThrow<string>('LAVA_SECRET_KEY')
+		return createHmac('sha256', secret).update(payload).digest('hex')
+	}
 
-		if (!dto.amount) {
+	public async createPayment(dto: PaymentDto) {
+		const PAYMENT_URL = 'https://api.lava.ru/business/invoice/create'
+		const LavaShopID = this.configService.getOrThrow<string>('LAVA_SHOP_ID')
+
+		if (!dto.sum) {
 			throw new BadRequestException()
 		}
 
-		const formattedAmount = Number(dto.amount).toFixed(2)
+		const formattedAmount = Number(dto.sum).toFixed(2)
 		const orderId = uuidv4()
 
 		const params = {
-			shop_id: MoruneShopId,
-			amount: formattedAmount,
-			order_id: orderId
+			sum: formattedAmount,
+			orderId: orderId,
+			shopId: LavaShopID
 		}
+
+		const json = JSON.stringify({ ...params })
+		const signature = await this.generateSignature(json)
 
 		try {
 			const response = await fetch(PAYMENT_URL, {
 				method: 'POST',
 				headers: {
 					'Content-Type': 'application/json',
-					'x-api-key':
-						this.configService.getOrThrow<string>('MORUNE_API_KEY')
+					Accept: 'application/json',
+					Signature: signature
 				},
-				body: JSON.stringify({ ...params })
+				body: json
 			})
 
 			const result = await response.json()
@@ -55,7 +63,14 @@ export class PaymentService {
 					`HTTP error! status: ${response.status}`
 				)
 			}
-			const amountInt = Math.floor(Number(dto.amount))
+
+			if (!result.data || !result.data.id) {
+				console.error('Lava API returned no data:', result)
+				throw new BadRequestException(
+					'Lava API error: ' + JSON.stringify(result?.error || result)
+				)
+			}
+			const amountInt = Math.floor(Number(dto.sum))
 
 			const payment = await this.prismaService.payment.create({
 				data: {
