@@ -7,5 +7,5 @@ export class PaymentDto {
 
 	@IsNumber({}, { message: 'sum должно быть числом.' })
 	@IsNotEmpty({ message: 'sum обязателен для заполнения.' })
-	sum: number
+	amount: number
 }

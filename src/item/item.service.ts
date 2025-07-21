@@ -58,7 +58,7 @@ export class ItemService {
 			throw new BadRequestException('Недостаточно средств на балансе.')
 		}
 
-		return this.prismaService.$transaction([
+		const result = await this.prismaService.$transaction([
 			this.prismaService.user.update({
 				where: {
 					id: dto.userId
@@ -77,6 +77,14 @@ export class ItemService {
 				}
 			})
 		])
+
+		await this.telegramService.sendMessage(
+			`🛒 Пользователь ${user.displayName} купил предмет: <b>${item.name}</b> (${dto.quantity} шт.) на сумму ${totalPrice}₽`,
+			false,
+			item.game
+		)
+
+		return result
 	}
 
 	public async withdrawItem(dto: WithdrawItemsDto) {
@@ -124,42 +132,5 @@ export class ItemService {
 				item: true
 			}
 		})
-	}
-
-	public async confirmIssuance(userId: string) {
-		if (!userId) {
-			throw new BadRequestException('User ID is required')
-		}
-
-		try {
-			const result = await this.prismaService.userItem.updateMany({
-				where: {
-					userId,
-					status: ItemStatus.WITHDRAWN,
-					isIssued: false
-				},
-				data: {
-					isIssued: true
-				}
-			})
-
-			if (result.count === 0) {
-				this.telegramService.sendMessage(
-					`ℹ️ Все товары уже были подтверждены ранее или отсутствуют для выдачи.\nID пользователя: ${userId}`
-				)
-				return '<h2>ℹ️ Все товары уже были подтверждены ранее или отсутствуют для выдачи.</h2>'
-			}
-
-			await this.telegramService.sendMessage(
-				`✅ Все товары успешно выданы для пользователя.\nID пользователя: ${userId}`
-			)
-
-			return '<h2>✅ Вывод подтверждён!</h2>'
-		} catch (error) {
-			console.error(error)
-			throw new InternalServerErrorException(
-				'Ошибка при подтверждении вывода'
-			)
-		}
 	}
 }

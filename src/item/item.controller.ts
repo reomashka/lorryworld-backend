@@ -42,9 +42,4 @@ export class ItemController {
 	public async withdrawtem(@Body() dto: WithdrawItemsDto) {
 		return this.itemService.withdrawItem(dto)
 	}
-
-	@Get('confirm-issuance/:userId')
-	async confirmIssuance(@Param('userId') userId: string) {
-		return this.itemService.confirmIssuance(userId)
-	}
 }

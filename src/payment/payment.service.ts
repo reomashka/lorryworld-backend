@@ -6,6 +6,7 @@ import { createHmac } from 'crypto'
 import { v4 as uuidv4 } from 'uuid'
 
 import { PrismaService } from '@/prisma/prisma.service'
+import { TelegramService } from '@/telegram/telegram.service'
 
 // ✅
 import { PaymentDto } from './dto/payment.dto'
@@ -15,7 +16,8 @@ import { PaymentWebhookDto } from './dto/paymentWebhook.dto'
 export class PaymentService {
 	public constructor(
 		private readonly configService: ConfigService,
-		private readonly prismaService: PrismaService
+		private readonly prismaService: PrismaService,
+		private readonly telegramService: TelegramService
 	) {}
 	private readonly logger = new Logger(PaymentService.name)
 
@@ -28,11 +30,11 @@ export class PaymentService {
 		const PAYMENT_URL = 'https://api.lava.ru/business/invoice/create'
 		const LavaShopID = this.configService.getOrThrow<string>('LAVA_SHOP_ID')
 
-		if (!dto.sum) {
+		if (!dto.amount) {
 			throw new BadRequestException()
 		}
 
-		const formattedAmount = Number(dto.sum).toFixed(2)
+		const formattedAmount = Number(dto.amount).toFixed(2)
 		const orderId = uuidv4()
 
 		const params = {
@@ -70,7 +72,7 @@ export class PaymentService {
 					'Lava API error: ' + JSON.stringify(result?.error || result)
 				)
 			}
-			const amountInt = Math.floor(Number(dto.sum))
+			const amountInt = Math.floor(Number(dto.amount))
 
 			const payment = await this.prismaService.payment.create({
 				data: {
@@ -250,6 +252,15 @@ export class PaymentService {
 						}
 					}
 				})
+
+				this.telegramService.sendMessage(
+					`<b>💳 Пополнение баланса</b>\n\n` +
+						`👤 <b>Пользователь ID:</b> <code>${payment.userId}</code>\n` +
+						`💰 <b>Сумма пополнения:</b> ${amountNumber}₽\n\n` +
+						`📥 <b>Баланс после пополнения:</b> ${user.balance}₽\n`,
+					false,
+					'topup'
+				)
 			}
 
 			return { statusPayment, data: payload }

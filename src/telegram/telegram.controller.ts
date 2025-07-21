@@ -1,4 +1,4 @@
-import { Body, Controller, Post } from '@nestjs/common'
+import { Body, Controller, HttpCode, HttpStatus, Post } from '@nestjs/common'
 
 import { TelegramService } from './telegram.service'
 
@@ -8,9 +8,21 @@ export class TelegramController {
 
 	@Post('send-msg')
 	public async sendMessage(
-		@Body() body: { text: string; withButton: boolean; userId: string }
+		@Body()
+		body: {
+			text: string
+			withButton: boolean
+			type: string
+			userId?: string
+		}
 	) {
-		const { text, withButton, userId } = body
-		return this.telegramService.sendMessage(text, withButton, userId)
+		const { text, withButton, userId, type } = body
+		return this.telegramService.sendMessage(text, withButton, userId, type)
+	}
+
+	@Post('webhook')
+	@HttpCode(HttpStatus.OK)
+	public async handle(@Body() payload: any) {
+		return await this.telegramService.handleWebhook(payload)
 	}
 }
