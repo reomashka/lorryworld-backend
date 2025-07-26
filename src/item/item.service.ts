@@ -151,7 +151,7 @@ export class ItemService {
 		})
 	}
 
-	public async confirmIssuance(userId: string, type: string) {
+	public async confirmIssuance(userId: string, type?: string) {
 		if (!userId) {
 			throw new BadRequestException('User ID is required')
 		}

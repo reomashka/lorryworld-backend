@@ -63,8 +63,9 @@ export class ItemController {
 	@Get('confirm-issuance/:userId/:type')
 	async confirmIssuance(
 		@Param('userId') userId: string,
-		@Param('type') type: string
+		@Param('type') type?: string
 	) {
-		return this.itemService.confirmIssuance(userId, type)
+		const finalType = type ?? 'MM'
+		return this.itemService.confirmIssuance(userId, finalType)
 	}
 }
