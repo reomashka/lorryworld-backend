@@ -49,7 +49,7 @@ export class TelegramService {
 						[
 							{
 								text: '✅ Подтвердить выдачу',
-								callback_data: `confirm_issuance_${userId}_${type}`
+								url: `${this.configService.getOrThrow<string>('PUBLIC_URL')}/api/item/confirm-issuance/${userId}/${type}`
 							}
 						]
 					]

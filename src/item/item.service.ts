@@ -1,6 +1,7 @@
 import {
 	BadRequestException,
 	Injectable,
+	InternalServerErrorException,
 	NotFoundException
 } from '@nestjs/common'
 import { ItemStatus } from '@prisma/__generated__'
@@ -148,5 +149,66 @@ export class ItemService {
 				item: true
 			}
 		})
+	}
+
+	public async confirmIssuance(userId: string, type: string) {
+		if (!userId) {
+			throw new BadRequestException('User ID is required')
+		}
+
+		try {
+			const result = await this.prismaService.userItem.updateMany({
+				where: {
+					userId,
+					status: ItemStatus.WITHDRAWN,
+					isIssued: false
+				},
+
+				data: {
+					isIssued: true
+				}
+			})
+
+			const user = await this.prismaService.user.findUnique({
+				where: {
+					id: userId
+				}
+			})
+
+			if (result.count === 0) {
+				this.telegramService.sendMessage(
+					`⚠️ <b>Информация о подтверждении выдачи</b> ⚠️\n\n` +
+						`▪️ <b>Статус:</b> Все товары уже подтверждены или отсутствуют\n` +
+						`▪️ <b>Пользователь:</b>\n` +
+						`   👤 <i>Имя:</i> ${user.displayName || 'Не указано'}\n` +
+						`   🆔 <i>ID:</i> ${userId}\n` +
+						`▪️ <b>Игра:</b> ${type}\n`,
+					false,
+					type
+				)
+
+				return '<h2>ℹ️ Все товары уже были подтверждены ранее или отсутствуют для выдачи.</h2>'
+			}
+
+			await this.telegramService.sendMessage(
+				`🎉 <b>Успешная выдача товаров</b> 🎉\n\n` +
+					`▪️ <b>Статус:</b> Все товары уже подтверждены или отсутствуют\n` +
+					`▪️ <b>Пользователь:</b>\n` +
+					`   👤 <i>Имя:</i> ${user.displayName || 'Не указано'}\n` +
+					`   🆔 <i>ID:</i> ${userId}\n` +
+					`▪️ <b>Игра:</b> ${type}\n` +
+					`✅ <b>Операция завершена успешно</b>`,
+				false,
+				type
+			)
+
+			return '<h2>✅ Вывод подтверждён!</h2>'
+		} catch (error) {
+			console.error(error)
+
+			throw new InternalServerErrorException(
+				'Ошибка при подтверждении вывода'
+			)
+		}
 	}
 }
