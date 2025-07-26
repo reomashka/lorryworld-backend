@@ -253,7 +253,7 @@ export class PaymentService {
 					}
 				})
 
-				this.telegramService.sendMessage(
+				await this.telegramService.sendMessage(
 					`<b>💳 Пополнение баланса</b>\n\n` +
 						`👤 <b>Пользователь ID:</b> <code>${payment.userId}</code>\n` +
 						`💰 <b>Сумма пополнения:</b> ${amountNumber}₽\n\n` +

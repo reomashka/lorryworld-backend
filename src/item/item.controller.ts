@@ -60,7 +60,7 @@ export class ItemController {
 		return this.itemService.withdrawItem(dto)
 	}
 
-	@Get('confirm-issuance/:userId/:type')
+	@Get('confirm-issuance/:userId/:type?')
 	async confirmIssuance(
 		@Param('userId') userId: string,
 		@Param('type') type?: string
