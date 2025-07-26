@@ -1,7 +1,6 @@
 import {
 	BadRequestException,
 	Injectable,
-	InternalServerErrorException,
 	NotFoundException
 } from '@nestjs/common'
 import { ItemStatus } from '@prisma/__generated__'
@@ -98,15 +97,32 @@ export class ItemService {
 			throw new NotFoundException('user not found')
 		}
 
-		return await this.prismaService.userItem.updateMany({
-			where: {
-				userId: dto.userId,
-				status: ItemStatus.PURCHASED
-			},
-			data: {
-				status: ItemStatus.WITHDRAWN
-			}
+		const result = this.prismaService.$transaction(async prisma => {
+			const order = await prisma.order.create({
+				data: {
+					userId: dto.userId,
+					isIssued: false
+				},
+				include: {
+					items: true
+				}
+			})
+
+			const userItem = await prisma.userItem.updateMany({
+				where: {
+					userId: dto.userId,
+					status: ItemStatus.PURCHASED,
+					orderId: null
+				},
+				data: {
+					status: ItemStatus.WITHDRAWN,
+					orderId: order.id
+				}
+			})
+
+			return { userItem, order }
 		})
+		return result
 	}
 
 	public async getAllRecentWithdrawnItems(userId: string) {

@@ -12,6 +12,7 @@ import { UserModule } from './user/user.module'
 import { ItemModule } from './item/item.module';
 import { TelegramModule } from './telegram/telegram.module';
 import { AdminModule } from './admin/admin.module';
+import { OrderModule } from './order/order.module';
 
 @Module({
 	imports: [
@@ -29,7 +30,8 @@ import { AdminModule } from './admin/admin.module';
 		UploadModule,
 		ItemModule,
 		TelegramModule,
-		AdminModule
+		AdminModule,
+		OrderModule
 	]
 })
 export class AppModule {}

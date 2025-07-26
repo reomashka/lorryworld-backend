@@ -122,28 +122,36 @@ exports.Prisma.TransactionIsolationLevel = makeStrictEnum({
 
 exports.Prisma.UserScalarFieldEnum = {
   id: 'id',
+  displayName: 'displayName',
   email: 'email',
-  password: 'password',
+  balance: 'balance',
+  contact: 'contact',
   role: 'role',
   isVerified: 'isVerified',
   method: 'method',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt',
-  balance: 'balance',
-  displayName: 'displayName',
-  contact: 'contact',
+  password: 'password',
   mediaContact: 'mediaContact'
 };
 
 exports.Prisma.UserItemScalarFieldEnum = {
   id: 'id',
   userId: 'userId',
+  orderId: 'orderId',
   itemId: 'itemId',
   quantity: 'quantity',
   amount: 'amount',
   status: 'status',
   isIssued: 'isIssued',
   updatedAt: 'updatedAt',
+  createdAt: 'createdAt'
+};
+
+exports.Prisma.OrderScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  isIssued: 'isIssued',
   createdAt: 'createdAt'
 };
 
@@ -256,6 +264,7 @@ exports.ItemRarity = exports.$Enums.ItemRarity = {
 exports.Prisma.ModelName = {
   User: 'User',
   UserItem: 'UserItem',
+  Order: 'Order',
   Token: 'Token',
   Payment: 'Payment',
   Item: 'Item'
