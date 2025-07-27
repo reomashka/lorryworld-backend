@@ -1586,6 +1586,7 @@ export namespace Prisma {
     email: string | null
     balance: number | null
     contact: string | null
+    robloxUsername: string | null
     role: $Enums.UserRole | null
     isVerified: boolean | null
     method: $Enums.AuthMethod | null
@@ -1601,6 +1602,7 @@ export namespace Prisma {
     email: string | null
     balance: number | null
     contact: string | null
+    robloxUsername: string | null
     role: $Enums.UserRole | null
     isVerified: boolean | null
     method: $Enums.AuthMethod | null
@@ -1616,6 +1618,7 @@ export namespace Prisma {
     email: number
     balance: number
     contact: number
+    robloxUsername: number
     role: number
     isVerified: number
     method: number
@@ -1641,6 +1644,7 @@ export namespace Prisma {
     email?: true
     balance?: true
     contact?: true
+    robloxUsername?: true
     role?: true
     isVerified?: true
     method?: true
@@ -1656,6 +1660,7 @@ export namespace Prisma {
     email?: true
     balance?: true
     contact?: true
+    robloxUsername?: true
     role?: true
     isVerified?: true
     method?: true
@@ -1671,6 +1676,7 @@ export namespace Prisma {
     email?: true
     balance?: true
     contact?: true
+    robloxUsername?: true
     role?: true
     isVerified?: true
     method?: true
@@ -1773,6 +1779,7 @@ export namespace Prisma {
     email: string | null
     balance: number
     contact: string | null
+    robloxUsername: string | null
     role: $Enums.UserRole
     isVerified: boolean
     method: $Enums.AuthMethod
@@ -1807,6 +1814,7 @@ export namespace Prisma {
     email?: boolean
     balance?: boolean
     contact?: boolean
+    robloxUsername?: boolean
     role?: boolean
     isVerified?: boolean
     method?: boolean
@@ -1826,6 +1834,7 @@ export namespace Prisma {
     email?: boolean
     balance?: boolean
     contact?: boolean
+    robloxUsername?: boolean
     role?: boolean
     isVerified?: boolean
     method?: boolean
@@ -1841,6 +1850,7 @@ export namespace Prisma {
     email?: boolean
     balance?: boolean
     contact?: boolean
+    robloxUsername?: boolean
     role?: boolean
     isVerified?: boolean
     method?: boolean
@@ -1856,6 +1866,7 @@ export namespace Prisma {
     email?: boolean
     balance?: boolean
     contact?: boolean
+    robloxUsername?: boolean
     role?: boolean
     isVerified?: boolean
     method?: boolean
@@ -1865,7 +1876,7 @@ export namespace Prisma {
     mediaContact?: boolean
   }
 
-  export type UserOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "displayName" | "email" | "balance" | "contact" | "role" | "isVerified" | "method" | "createdAt" | "updatedAt" | "password" | "mediaContact", ExtArgs["result"]["user"]>
+  export type UserOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "displayName" | "email" | "balance" | "contact" | "robloxUsername" | "role" | "isVerified" | "method" | "createdAt" | "updatedAt" | "password" | "mediaContact", ExtArgs["result"]["user"]>
   export type UserInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     payments?: boolean | User$paymentsArgs<ExtArgs>
     items?: boolean | User$itemsArgs<ExtArgs>
@@ -1888,6 +1899,7 @@ export namespace Prisma {
       email: string | null
       balance: number
       contact: string | null
+      robloxUsername: string | null
       role: $Enums.UserRole
       isVerified: boolean
       method: $Enums.AuthMethod
@@ -2326,6 +2338,7 @@ export namespace Prisma {
     readonly email: FieldRef<"User", 'String'>
     readonly balance: FieldRef<"User", 'Int'>
     readonly contact: FieldRef<"User", 'String'>
+    readonly robloxUsername: FieldRef<"User", 'String'>
     readonly role: FieldRef<"User", 'UserRole'>
     readonly isVerified: FieldRef<"User", 'Boolean'>
     readonly method: FieldRef<"User", 'AuthMethod'>
@@ -8473,6 +8486,7 @@ export namespace Prisma {
     email: 'email',
     balance: 'balance',
     contact: 'contact',
+    robloxUsername: 'robloxUsername',
     role: 'role',
     isVerified: 'isVerified',
     method: 'method',
@@ -8784,6 +8798,7 @@ export namespace Prisma {
     email?: StringNullableFilter<"User"> | string | null
     balance?: IntFilter<"User"> | number
     contact?: StringNullableFilter<"User"> | string | null
+    robloxUsername?: StringNullableFilter<"User"> | string | null
     role?: EnumUserRoleFilter<"User"> | $Enums.UserRole
     isVerified?: BoolFilter<"User"> | boolean
     method?: EnumAuthMethodFilter<"User"> | $Enums.AuthMethod
@@ -8802,6 +8817,7 @@ export namespace Prisma {
     email?: SortOrderInput | SortOrder
     balance?: SortOrder
     contact?: SortOrderInput | SortOrder
+    robloxUsername?: SortOrderInput | SortOrder
     role?: SortOrder
     isVerified?: SortOrder
     method?: SortOrder
@@ -8823,6 +8839,7 @@ export namespace Prisma {
     NOT?: UserWhereInput | UserWhereInput[]
     balance?: IntFilter<"User"> | number
     contact?: StringNullableFilter<"User"> | string | null
+    robloxUsername?: StringNullableFilter<"User"> | string | null
     role?: EnumUserRoleFilter<"User"> | $Enums.UserRole
     isVerified?: BoolFilter<"User"> | boolean
     method?: EnumAuthMethodFilter<"User"> | $Enums.AuthMethod
@@ -8841,6 +8858,7 @@ export namespace Prisma {
     email?: SortOrderInput | SortOrder
     balance?: SortOrder
     contact?: SortOrderInput | SortOrder
+    robloxUsername?: SortOrderInput | SortOrder
     role?: SortOrder
     isVerified?: SortOrder
     method?: SortOrder
@@ -8864,6 +8882,7 @@ export namespace Prisma {
     email?: StringNullableWithAggregatesFilter<"User"> | string | null
     balance?: IntWithAggregatesFilter<"User"> | number
     contact?: StringNullableWithAggregatesFilter<"User"> | string | null
+    robloxUsername?: StringNullableWithAggregatesFilter<"User"> | string | null
     role?: EnumUserRoleWithAggregatesFilter<"User"> | $Enums.UserRole
     isVerified?: BoolWithAggregatesFilter<"User"> | boolean
     method?: EnumAuthMethodWithAggregatesFilter<"User"> | $Enums.AuthMethod
@@ -9238,6 +9257,7 @@ export namespace Prisma {
     email?: string | null
     balance?: number
     contact?: string | null
+    robloxUsername?: string | null
     role?: $Enums.UserRole
     isVerified?: boolean
     method?: $Enums.AuthMethod
@@ -9256,6 +9276,7 @@ export namespace Prisma {
     email?: string | null
     balance?: number
     contact?: string | null
+    robloxUsername?: string | null
     role?: $Enums.UserRole
     isVerified?: boolean
     method?: $Enums.AuthMethod
@@ -9274,6 +9295,7 @@ export namespace Prisma {
     email?: NullableStringFieldUpdateOperationsInput | string | null
     balance?: IntFieldUpdateOperationsInput | number
     contact?: NullableStringFieldUpdateOperationsInput | string | null
+    robloxUsername?: NullableStringFieldUpdateOperationsInput | string | null
     role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
     isVerified?: BoolFieldUpdateOperationsInput | boolean
     method?: EnumAuthMethodFieldUpdateOperationsInput | $Enums.AuthMethod
@@ -9292,6 +9314,7 @@ export namespace Prisma {
     email?: NullableStringFieldUpdateOperationsInput | string | null
     balance?: IntFieldUpdateOperationsInput | number
     contact?: NullableStringFieldUpdateOperationsInput | string | null
+    robloxUsername?: NullableStringFieldUpdateOperationsInput | string | null
     role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
     isVerified?: BoolFieldUpdateOperationsInput | boolean
     method?: EnumAuthMethodFieldUpdateOperationsInput | $Enums.AuthMethod
@@ -9310,6 +9333,7 @@ export namespace Prisma {
     email?: string | null
     balance?: number
     contact?: string | null
+    robloxUsername?: string | null
     role?: $Enums.UserRole
     isVerified?: boolean
     method?: $Enums.AuthMethod
@@ -9325,6 +9349,7 @@ export namespace Prisma {
     email?: NullableStringFieldUpdateOperationsInput | string | null
     balance?: IntFieldUpdateOperationsInput | number
     contact?: NullableStringFieldUpdateOperationsInput | string | null
+    robloxUsername?: NullableStringFieldUpdateOperationsInput | string | null
     role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
     isVerified?: BoolFieldUpdateOperationsInput | boolean
     method?: EnumAuthMethodFieldUpdateOperationsInput | $Enums.AuthMethod
@@ -9340,6 +9365,7 @@ export namespace Prisma {
     email?: NullableStringFieldUpdateOperationsInput | string | null
     balance?: IntFieldUpdateOperationsInput | number
     contact?: NullableStringFieldUpdateOperationsInput | string | null
+    robloxUsername?: NullableStringFieldUpdateOperationsInput | string | null
     role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
     isVerified?: BoolFieldUpdateOperationsInput | boolean
     method?: EnumAuthMethodFieldUpdateOperationsInput | $Enums.AuthMethod
@@ -9843,6 +9869,7 @@ export namespace Prisma {
     email?: SortOrder
     balance?: SortOrder
     contact?: SortOrder
+    robloxUsername?: SortOrder
     role?: SortOrder
     isVerified?: SortOrder
     method?: SortOrder
@@ -9862,6 +9889,7 @@ export namespace Prisma {
     email?: SortOrder
     balance?: SortOrder
     contact?: SortOrder
+    robloxUsername?: SortOrder
     role?: SortOrder
     isVerified?: SortOrder
     method?: SortOrder
@@ -9877,6 +9905,7 @@ export namespace Prisma {
     email?: SortOrder
     balance?: SortOrder
     contact?: SortOrder
+    robloxUsername?: SortOrder
     role?: SortOrder
     isVerified?: SortOrder
     method?: SortOrder
@@ -11259,6 +11288,7 @@ export namespace Prisma {
     email?: string | null
     balance?: number
     contact?: string | null
+    robloxUsername?: string | null
     role?: $Enums.UserRole
     isVerified?: boolean
     method?: $Enums.AuthMethod
@@ -11276,6 +11306,7 @@ export namespace Prisma {
     email?: string | null
     balance?: number
     contact?: string | null
+    robloxUsername?: string | null
     role?: $Enums.UserRole
     isVerified?: boolean
     method?: $Enums.AuthMethod
@@ -11357,6 +11388,7 @@ export namespace Prisma {
     email?: NullableStringFieldUpdateOperationsInput | string | null
     balance?: IntFieldUpdateOperationsInput | number
     contact?: NullableStringFieldUpdateOperationsInput | string | null
+    robloxUsername?: NullableStringFieldUpdateOperationsInput | string | null
     role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
     isVerified?: BoolFieldUpdateOperationsInput | boolean
     method?: EnumAuthMethodFieldUpdateOperationsInput | $Enums.AuthMethod
@@ -11374,6 +11406,7 @@ export namespace Prisma {
     email?: NullableStringFieldUpdateOperationsInput | string | null
     balance?: IntFieldUpdateOperationsInput | number
     contact?: NullableStringFieldUpdateOperationsInput | string | null
+    robloxUsername?: NullableStringFieldUpdateOperationsInput | string | null
     role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
     isVerified?: BoolFieldUpdateOperationsInput | boolean
     method?: EnumAuthMethodFieldUpdateOperationsInput | $Enums.AuthMethod
@@ -11451,6 +11484,7 @@ export namespace Prisma {
     email?: string | null
     balance?: number
     contact?: string | null
+    robloxUsername?: string | null
     role?: $Enums.UserRole
     isVerified?: boolean
     method?: $Enums.AuthMethod
@@ -11468,6 +11502,7 @@ export namespace Prisma {
     email?: string | null
     balance?: number
     contact?: string | null
+    robloxUsername?: string | null
     role?: $Enums.UserRole
     isVerified?: boolean
     method?: $Enums.AuthMethod
@@ -11535,6 +11570,7 @@ export namespace Prisma {
     email?: NullableStringFieldUpdateOperationsInput | string | null
     balance?: IntFieldUpdateOperationsInput | number
     contact?: NullableStringFieldUpdateOperationsInput | string | null
+    robloxUsername?: NullableStringFieldUpdateOperationsInput | string | null
     role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
     isVerified?: BoolFieldUpdateOperationsInput | boolean
     method?: EnumAuthMethodFieldUpdateOperationsInput | $Enums.AuthMethod
@@ -11552,6 +11588,7 @@ export namespace Prisma {
     email?: NullableStringFieldUpdateOperationsInput | string | null
     balance?: IntFieldUpdateOperationsInput | number
     contact?: NullableStringFieldUpdateOperationsInput | string | null
+    robloxUsername?: NullableStringFieldUpdateOperationsInput | string | null
     role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
     isVerified?: BoolFieldUpdateOperationsInput | boolean
     method?: EnumAuthMethodFieldUpdateOperationsInput | $Enums.AuthMethod
@@ -11585,6 +11622,7 @@ export namespace Prisma {
     email?: string | null
     balance?: number
     contact?: string | null
+    robloxUsername?: string | null
     role?: $Enums.UserRole
     isVerified?: boolean
     method?: $Enums.AuthMethod
@@ -11602,6 +11640,7 @@ export namespace Prisma {
     email?: string | null
     balance?: number
     contact?: string | null
+    robloxUsername?: string | null
     role?: $Enums.UserRole
     isVerified?: boolean
     method?: $Enums.AuthMethod
@@ -11635,6 +11674,7 @@ export namespace Prisma {
     email?: NullableStringFieldUpdateOperationsInput | string | null
     balance?: IntFieldUpdateOperationsInput | number
     contact?: NullableStringFieldUpdateOperationsInput | string | null
+    robloxUsername?: NullableStringFieldUpdateOperationsInput | string | null
     role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
     isVerified?: BoolFieldUpdateOperationsInput | boolean
     method?: EnumAuthMethodFieldUpdateOperationsInput | $Enums.AuthMethod
@@ -11652,6 +11692,7 @@ export namespace Prisma {
     email?: NullableStringFieldUpdateOperationsInput | string | null
     balance?: IntFieldUpdateOperationsInput | number
     contact?: NullableStringFieldUpdateOperationsInput | string | null
+    robloxUsername?: NullableStringFieldUpdateOperationsInput | string | null
     role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
     isVerified?: BoolFieldUpdateOperationsInput | boolean
     method?: EnumAuthMethodFieldUpdateOperationsInput | $Enums.AuthMethod

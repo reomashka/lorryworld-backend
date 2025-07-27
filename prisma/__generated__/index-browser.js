@@ -126,6 +126,7 @@ exports.Prisma.UserScalarFieldEnum = {
   email: 'email',
   balance: 'balance',
   contact: 'contact',
+  robloxUsername: 'robloxUsername',
   role: 'role',
   isVerified: 'isVerified',
   method: 'method',

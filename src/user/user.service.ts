@@ -77,6 +77,8 @@ export class UserService {
 		if (dto.mediaContact !== undefined)
 			dataToUpdate.mediaContact = dto.mediaContact
 		if (dto.contact !== undefined) dataToUpdate.contact = dto.contact
+		if (dto.robloxUsername !== undefined)
+			dataToUpdate.robloxUsername = dto.robloxUsername
 
 		const updatedUser = await this.prismaService.user.update({
 			where: {

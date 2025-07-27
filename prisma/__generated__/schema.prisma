@@ -10,11 +10,12 @@ datasource db {
 }
 
 model User {
-  id          String  @id @default(uuid())
-  displayName String  @unique @map("display_name")
-  email       String? @unique
-  balance     Int     @default(0)
-  contact     String?
+  id             String  @id @default(uuid())
+  displayName    String  @unique @map("display_name")
+  email          String? @unique
+  balance        Int     @default(0)
+  contact        String?
+  robloxUsername String?
 
   role       UserRole   @default(REGULAR)
   isVerified Boolean    @default(false) @map("is_verified")

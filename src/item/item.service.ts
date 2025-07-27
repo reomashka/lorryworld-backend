@@ -79,7 +79,10 @@ export class ItemService {
 		])
 
 		await this.telegramService.sendMessage(
-			`🛒 Пользователь ${user.displayName} купил предмет: <b>${item.name}</b> (${dto.quantity} шт.) на сумму ${totalPrice}₽`,
+			`🛒 Пользователь ${user.displayName} купил предмет\n\n` +
+				` <b>${item.name}</b> (${dto.quantity} шт.) на сумму ${totalPrice}₽\n` +
+				` <b>ID пользователя:</b> ${user.id}\n` +
+				` <b>Ник на сайте:</b> ${user.displayName}\n`,
 			false,
 			item.game
 		)
@@ -180,7 +183,8 @@ export class ItemService {
 					`ℹ️ Все товары уже были подтверждены ранее или отсутствуют для выдачи.\n\n` +
 						` <b>ID пользователя:</b> ${userId}\n` +
 						` <b>Контакт:</b> ${user.contact}\n` +
-						` <b>Ник на сайте:</b> ${user.displayName}\n`,
+						` <b>Ник на сайте:</b> ${user.displayName}\n` +
+						` <b>Роблокс никнейм:</b> ${user.robloxUsername}\n`,
 					false,
 					type
 				)
@@ -192,7 +196,8 @@ export class ItemService {
 				`✅ Все товары успешно выданы для пользователя.\n\n` +
 					` <b>ID пользователя:</b> ${userId}\n` +
 					` <b>Контакт:</b> ${user.contact}\n` +
-					` <b>Ник на сайте:</b> ${user.displayName}\n`,
+					` <b>Ник на сайте:</b> ${user.displayName}\n` +
+					` <b>Роблокс никнейм:</b> ${user.robloxUsername}\n`,
 				false,
 				type
 			)

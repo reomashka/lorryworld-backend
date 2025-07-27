@@ -17,4 +17,8 @@ export class UpdateUserDto {
 	@IsString({ message: 'Социальная сеть должна быть строкой.' })
 	@IsOptional()
 	mediaContact?: string
+
+	@IsString({ message: 'robloxUsername должен быть строкой.' })
+	@IsOptional()
+	robloxUsername?: string
 }
