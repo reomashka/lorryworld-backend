@@ -7,7 +7,12 @@
 */
 -- AlterTable
 ALTER TABLE "items"
-  ALTER COLUMN "type" TYPE TEXT USING "type"::text,
-  ALTER COLUMN "rarity" TYPE TEXT USING "rarity"::text,
-  ALTER COLUMN "game" DROP NOT NULL,
-  ALTER COLUMN "game" DROP DEFAULT;
+  ALTER COLUMN "game" DROP DEFAULT,
+  ALTER COLUMN "game" DROP NOT NULL;
+
+ALTER TABLE "items"
+  ALTER COLUMN "game" TYPE "Game" USING "game"::text::"Game";
+
+ALTER TABLE "items"
+  ALTER COLUMN "game" SET DEFAULT 'MM',
+  ALTER COLUMN "game" SET NOT NULL;
