@@ -257,7 +257,7 @@ export class PaymentService {
 					`<b>💳 Пополнение баланса</b>\n\n` +
 						`👤 <b>Пользователь ID:</b> <code>${payment.userId}</code>\n` +
 						`💰 <b>Сумма пополнения:</b> ${amountNumber}₽\n\n` +
-						`📥 <b>Баланс после пополнения:</b> ${user.balance}₽\n`,
+						`📥 <b>Баланс после пополнения:</b> ${user.balance + amountNumber}₽\n`,
 					false,
 					'topup'
 				)
