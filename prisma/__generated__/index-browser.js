@@ -184,10 +184,10 @@ exports.Prisma.ItemScalarFieldEnum = {
   sale: 'sale',
   availability: 'availability',
   type: 'type',
+  rarity: 'rarity',
   icon: 'icon',
   description: 'description',
-  game: 'game',
-  rarity: 'rarity'
+  game: 'game'
 };
 
 exports.Prisma.SortOrder = {
@@ -247,19 +247,9 @@ exports.PaymentStatus = exports.$Enums.PaymentStatus = {
   UNKNOWN: 'UNKNOWN'
 };
 
-exports.ItemType = exports.$Enums.ItemType = {
-  KNIFE: 'KNIFE',
-  SET: 'SET',
-  PISTOL: 'PISTOL',
-  PET: 'PET'
-};
-
-exports.ItemRarity = exports.$Enums.ItemRarity = {
-  Chroma: 'Chroma',
-  Ancients: 'Ancients',
-  Godly: 'Godly',
-  Vintages: 'Vintages',
-  Corrupt: 'Corrupt'
+exports.Game = exports.$Enums.Game = {
+  MM: 'MM',
+  GAG: 'GAG'
 };
 
 exports.Prisma.ModelName = {

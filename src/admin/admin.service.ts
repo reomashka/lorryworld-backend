@@ -110,4 +110,19 @@ export class AdminService {
 
 		return { earnings, items }
 	}
+
+	public async getStatsRegistrations(from: Date, to: Date) {
+		return this.prismaService.user.findMany({
+			where: {
+				createdAt: {
+					gte: from,
+					lte: to
+				}
+			},
+			select: {
+				id: true,
+				createdAt: true
+			}
+		})
+	}
 }

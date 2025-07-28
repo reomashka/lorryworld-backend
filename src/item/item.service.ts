@@ -20,7 +20,9 @@ export class ItemService {
 	) {}
 
 	public async getAllItems() {
-		return await this.prismaService.item.findMany()
+		return await this.prismaService.item.findMany({
+			where: { availability: true }
+		})
 	}
 
 	public async getAllPurchasedItems(userId: string) {

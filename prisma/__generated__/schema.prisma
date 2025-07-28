@@ -98,14 +98,19 @@ model Item {
   price        Int
   sale         Int?
   availability Boolean    @default(true)
-  type         ItemType
+  type         String?
+  rarity       String?
   icon         String
   description  String?
-  game         String     @default("MM")
-  rarity       ItemRarity
+  game         Game       @default(MM)
   users        UserItem[]
 
   @@map("items")
+}
+
+enum Game {
+  MM
+  GAG
 }
 
 enum MediaContactType {

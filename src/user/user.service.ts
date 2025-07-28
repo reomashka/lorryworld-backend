@@ -68,6 +68,8 @@ export class UserService {
 	}
 
 	public async update(userId: string, dto: UpdateUserDto) {
+		console.log('DTO:', dto)
+
 		const user = await this.findById(userId)
 
 		const dataToUpdate: any = {}

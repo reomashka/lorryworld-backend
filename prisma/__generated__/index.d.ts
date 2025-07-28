@@ -48,7 +48,15 @@ export type Item = $Result.DefaultSelection<Prisma.$ItemPayload>
  * Enums
  */
 export namespace $Enums {
-  export const MediaContactType: {
+  export const Game: {
+  MM: 'MM',
+  GAG: 'GAG'
+};
+
+export type Game = (typeof Game)[keyof typeof Game]
+
+
+export const MediaContactType: {
   TELEGRAM: 'TELEGRAM',
   VK: 'VK',
   EMAIL: 'EMAIL'
@@ -133,6 +141,10 @@ export const TokenType: {
 export type TokenType = (typeof TokenType)[keyof typeof TokenType]
 
 }
+
+export type Game = $Enums.Game
+
+export const Game: typeof $Enums.Game
 
 export type MediaContactType = $Enums.MediaContactType
 
@@ -7319,11 +7331,11 @@ export namespace Prisma {
     price: number | null
     sale: number | null
     availability: boolean | null
-    type: $Enums.ItemType | null
+    type: string | null
+    rarity: string | null
     icon: string | null
     description: string | null
-    game: string | null
-    rarity: $Enums.ItemRarity | null
+    game: $Enums.Game | null
   }
 
   export type ItemMaxAggregateOutputType = {
@@ -7332,11 +7344,11 @@ export namespace Prisma {
     price: number | null
     sale: number | null
     availability: boolean | null
-    type: $Enums.ItemType | null
+    type: string | null
+    rarity: string | null
     icon: string | null
     description: string | null
-    game: string | null
-    rarity: $Enums.ItemRarity | null
+    game: $Enums.Game | null
   }
 
   export type ItemCountAggregateOutputType = {
@@ -7346,10 +7358,10 @@ export namespace Prisma {
     sale: number
     availability: number
     type: number
+    rarity: number
     icon: number
     description: number
     game: number
-    rarity: number
     _all: number
   }
 
@@ -7373,10 +7385,10 @@ export namespace Prisma {
     sale?: true
     availability?: true
     type?: true
+    rarity?: true
     icon?: true
     description?: true
     game?: true
-    rarity?: true
   }
 
   export type ItemMaxAggregateInputType = {
@@ -7386,10 +7398,10 @@ export namespace Prisma {
     sale?: true
     availability?: true
     type?: true
+    rarity?: true
     icon?: true
     description?: true
     game?: true
-    rarity?: true
   }
 
   export type ItemCountAggregateInputType = {
@@ -7399,10 +7411,10 @@ export namespace Prisma {
     sale?: true
     availability?: true
     type?: true
+    rarity?: true
     icon?: true
     description?: true
     game?: true
-    rarity?: true
     _all?: true
   }
 
@@ -7498,11 +7510,11 @@ export namespace Prisma {
     price: number
     sale: number | null
     availability: boolean
-    type: $Enums.ItemType
+    type: string | null
+    rarity: string | null
     icon: string
     description: string | null
-    game: string
-    rarity: $Enums.ItemRarity
+    game: $Enums.Game
     _count: ItemCountAggregateOutputType | null
     _avg: ItemAvgAggregateOutputType | null
     _sum: ItemSumAggregateOutputType | null
@@ -7531,10 +7543,10 @@ export namespace Prisma {
     sale?: boolean
     availability?: boolean
     type?: boolean
+    rarity?: boolean
     icon?: boolean
     description?: boolean
     game?: boolean
-    rarity?: boolean
     users?: boolean | Item$usersArgs<ExtArgs>
     _count?: boolean | ItemCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["item"]>
@@ -7546,10 +7558,10 @@ export namespace Prisma {
     sale?: boolean
     availability?: boolean
     type?: boolean
+    rarity?: boolean
     icon?: boolean
     description?: boolean
     game?: boolean
-    rarity?: boolean
   }, ExtArgs["result"]["item"]>
 
   export type ItemSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
@@ -7559,10 +7571,10 @@ export namespace Prisma {
     sale?: boolean
     availability?: boolean
     type?: boolean
+    rarity?: boolean
     icon?: boolean
     description?: boolean
     game?: boolean
-    rarity?: boolean
   }, ExtArgs["result"]["item"]>
 
   export type ItemSelectScalar = {
@@ -7572,13 +7584,13 @@ export namespace Prisma {
     sale?: boolean
     availability?: boolean
     type?: boolean
+    rarity?: boolean
     icon?: boolean
     description?: boolean
     game?: boolean
-    rarity?: boolean
   }
 
-  export type ItemOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "name" | "price" | "sale" | "availability" | "type" | "icon" | "description" | "game" | "rarity", ExtArgs["result"]["item"]>
+  export type ItemOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "name" | "price" | "sale" | "availability" | "type" | "rarity" | "icon" | "description" | "game", ExtArgs["result"]["item"]>
   export type ItemInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     users?: boolean | Item$usersArgs<ExtArgs>
     _count?: boolean | ItemCountOutputTypeDefaultArgs<ExtArgs>
@@ -7597,11 +7609,11 @@ export namespace Prisma {
       price: number
       sale: number | null
       availability: boolean
-      type: $Enums.ItemType
+      type: string | null
+      rarity: string | null
       icon: string
       description: string | null
-      game: string
-      rarity: $Enums.ItemRarity
+      game: $Enums.Game
     }, ExtArgs["result"]["item"]>
     composites: {}
   }
@@ -8031,11 +8043,11 @@ export namespace Prisma {
     readonly price: FieldRef<"Item", 'Int'>
     readonly sale: FieldRef<"Item", 'Int'>
     readonly availability: FieldRef<"Item", 'Boolean'>
-    readonly type: FieldRef<"Item", 'ItemType'>
+    readonly type: FieldRef<"Item", 'String'>
+    readonly rarity: FieldRef<"Item", 'String'>
     readonly icon: FieldRef<"Item", 'String'>
     readonly description: FieldRef<"Item", 'String'>
-    readonly game: FieldRef<"Item", 'String'>
-    readonly rarity: FieldRef<"Item", 'ItemRarity'>
+    readonly game: FieldRef<"Item", 'Game'>
   }
     
 
@@ -8559,10 +8571,10 @@ export namespace Prisma {
     sale: 'sale',
     availability: 'availability',
     type: 'type',
+    rarity: 'rarity',
     icon: 'icon',
     description: 'description',
-    game: 'game',
-    rarity: 'rarity'
+    game: 'game'
   };
 
   export type ItemScalarFieldEnum = (typeof ItemScalarFieldEnum)[keyof typeof ItemScalarFieldEnum]
@@ -8745,30 +8757,16 @@ export namespace Prisma {
 
 
   /**
-   * Reference to a field of type 'ItemType'
+   * Reference to a field of type 'Game'
    */
-  export type EnumItemTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'ItemType'>
+  export type EnumGameFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Game'>
     
 
 
   /**
-   * Reference to a field of type 'ItemType[]'
+   * Reference to a field of type 'Game[]'
    */
-  export type ListEnumItemTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'ItemType[]'>
-    
-
-
-  /**
-   * Reference to a field of type 'ItemRarity'
-   */
-  export type EnumItemRarityFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'ItemRarity'>
-    
-
-
-  /**
-   * Reference to a field of type 'ItemRarity[]'
-   */
-  export type ListEnumItemRarityFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'ItemRarity[]'>
+  export type ListEnumGameFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Game[]'>
     
 
 
@@ -9178,11 +9176,11 @@ export namespace Prisma {
     price?: IntFilter<"Item"> | number
     sale?: IntNullableFilter<"Item"> | number | null
     availability?: BoolFilter<"Item"> | boolean
-    type?: EnumItemTypeFilter<"Item"> | $Enums.ItemType
+    type?: StringNullableFilter<"Item"> | string | null
+    rarity?: StringNullableFilter<"Item"> | string | null
     icon?: StringFilter<"Item"> | string
     description?: StringNullableFilter<"Item"> | string | null
-    game?: StringFilter<"Item"> | string
-    rarity?: EnumItemRarityFilter<"Item"> | $Enums.ItemRarity
+    game?: EnumGameFilter<"Item"> | $Enums.Game
     users?: UserItemListRelationFilter
   }
 
@@ -9192,11 +9190,11 @@ export namespace Prisma {
     price?: SortOrder
     sale?: SortOrderInput | SortOrder
     availability?: SortOrder
-    type?: SortOrder
+    type?: SortOrderInput | SortOrder
+    rarity?: SortOrderInput | SortOrder
     icon?: SortOrder
     description?: SortOrderInput | SortOrder
     game?: SortOrder
-    rarity?: SortOrder
     users?: UserItemOrderByRelationAggregateInput
   }
 
@@ -9209,11 +9207,11 @@ export namespace Prisma {
     price?: IntFilter<"Item"> | number
     sale?: IntNullableFilter<"Item"> | number | null
     availability?: BoolFilter<"Item"> | boolean
-    type?: EnumItemTypeFilter<"Item"> | $Enums.ItemType
+    type?: StringNullableFilter<"Item"> | string | null
+    rarity?: StringNullableFilter<"Item"> | string | null
     icon?: StringFilter<"Item"> | string
     description?: StringNullableFilter<"Item"> | string | null
-    game?: StringFilter<"Item"> | string
-    rarity?: EnumItemRarityFilter<"Item"> | $Enums.ItemRarity
+    game?: EnumGameFilter<"Item"> | $Enums.Game
     users?: UserItemListRelationFilter
   }, "id">
 
@@ -9223,11 +9221,11 @@ export namespace Prisma {
     price?: SortOrder
     sale?: SortOrderInput | SortOrder
     availability?: SortOrder
-    type?: SortOrder
+    type?: SortOrderInput | SortOrder
+    rarity?: SortOrderInput | SortOrder
     icon?: SortOrder
     description?: SortOrderInput | SortOrder
     game?: SortOrder
-    rarity?: SortOrder
     _count?: ItemCountOrderByAggregateInput
     _avg?: ItemAvgOrderByAggregateInput
     _max?: ItemMaxOrderByAggregateInput
@@ -9244,11 +9242,11 @@ export namespace Prisma {
     price?: IntWithAggregatesFilter<"Item"> | number
     sale?: IntNullableWithAggregatesFilter<"Item"> | number | null
     availability?: BoolWithAggregatesFilter<"Item"> | boolean
-    type?: EnumItemTypeWithAggregatesFilter<"Item"> | $Enums.ItemType
+    type?: StringNullableWithAggregatesFilter<"Item"> | string | null
+    rarity?: StringNullableWithAggregatesFilter<"Item"> | string | null
     icon?: StringWithAggregatesFilter<"Item"> | string
     description?: StringNullableWithAggregatesFilter<"Item"> | string | null
-    game?: StringWithAggregatesFilter<"Item"> | string
-    rarity?: EnumItemRarityWithAggregatesFilter<"Item"> | $Enums.ItemRarity
+    game?: EnumGameWithAggregatesFilter<"Item"> | $Enums.Game
   }
 
   export type UserCreateInput = {
@@ -9663,11 +9661,11 @@ export namespace Prisma {
     price: number
     sale?: number | null
     availability?: boolean
-    type: $Enums.ItemType
+    type?: string | null
+    rarity?: string | null
     icon: string
     description?: string | null
-    game?: string
-    rarity: $Enums.ItemRarity
+    game?: $Enums.Game
     users?: UserItemCreateNestedManyWithoutItemInput
   }
 
@@ -9677,11 +9675,11 @@ export namespace Prisma {
     price: number
     sale?: number | null
     availability?: boolean
-    type: $Enums.ItemType
+    type?: string | null
+    rarity?: string | null
     icon: string
     description?: string | null
-    game?: string
-    rarity: $Enums.ItemRarity
+    game?: $Enums.Game
     users?: UserItemUncheckedCreateNestedManyWithoutItemInput
   }
 
@@ -9690,11 +9688,11 @@ export namespace Prisma {
     price?: IntFieldUpdateOperationsInput | number
     sale?: NullableIntFieldUpdateOperationsInput | number | null
     availability?: BoolFieldUpdateOperationsInput | boolean
-    type?: EnumItemTypeFieldUpdateOperationsInput | $Enums.ItemType
+    type?: NullableStringFieldUpdateOperationsInput | string | null
+    rarity?: NullableStringFieldUpdateOperationsInput | string | null
     icon?: StringFieldUpdateOperationsInput | string
     description?: NullableStringFieldUpdateOperationsInput | string | null
-    game?: StringFieldUpdateOperationsInput | string
-    rarity?: EnumItemRarityFieldUpdateOperationsInput | $Enums.ItemRarity
+    game?: EnumGameFieldUpdateOperationsInput | $Enums.Game
     users?: UserItemUpdateManyWithoutItemNestedInput
   }
 
@@ -9704,11 +9702,11 @@ export namespace Prisma {
     price?: IntFieldUpdateOperationsInput | number
     sale?: NullableIntFieldUpdateOperationsInput | number | null
     availability?: BoolFieldUpdateOperationsInput | boolean
-    type?: EnumItemTypeFieldUpdateOperationsInput | $Enums.ItemType
+    type?: NullableStringFieldUpdateOperationsInput | string | null
+    rarity?: NullableStringFieldUpdateOperationsInput | string | null
     icon?: StringFieldUpdateOperationsInput | string
     description?: NullableStringFieldUpdateOperationsInput | string | null
-    game?: StringFieldUpdateOperationsInput | string
-    rarity?: EnumItemRarityFieldUpdateOperationsInput | $Enums.ItemRarity
+    game?: EnumGameFieldUpdateOperationsInput | $Enums.Game
     users?: UserItemUncheckedUpdateManyWithoutItemNestedInput
   }
 
@@ -9718,11 +9716,11 @@ export namespace Prisma {
     price: number
     sale?: number | null
     availability?: boolean
-    type: $Enums.ItemType
+    type?: string | null
+    rarity?: string | null
     icon: string
     description?: string | null
-    game?: string
-    rarity: $Enums.ItemRarity
+    game?: $Enums.Game
   }
 
   export type ItemUpdateManyMutationInput = {
@@ -9730,11 +9728,11 @@ export namespace Prisma {
     price?: IntFieldUpdateOperationsInput | number
     sale?: NullableIntFieldUpdateOperationsInput | number | null
     availability?: BoolFieldUpdateOperationsInput | boolean
-    type?: EnumItemTypeFieldUpdateOperationsInput | $Enums.ItemType
+    type?: NullableStringFieldUpdateOperationsInput | string | null
+    rarity?: NullableStringFieldUpdateOperationsInput | string | null
     icon?: StringFieldUpdateOperationsInput | string
     description?: NullableStringFieldUpdateOperationsInput | string | null
-    game?: StringFieldUpdateOperationsInput | string
-    rarity?: EnumItemRarityFieldUpdateOperationsInput | $Enums.ItemRarity
+    game?: EnumGameFieldUpdateOperationsInput | $Enums.Game
   }
 
   export type ItemUncheckedUpdateManyInput = {
@@ -9743,11 +9741,11 @@ export namespace Prisma {
     price?: IntFieldUpdateOperationsInput | number
     sale?: NullableIntFieldUpdateOperationsInput | number | null
     availability?: BoolFieldUpdateOperationsInput | boolean
-    type?: EnumItemTypeFieldUpdateOperationsInput | $Enums.ItemType
+    type?: NullableStringFieldUpdateOperationsInput | string | null
+    rarity?: NullableStringFieldUpdateOperationsInput | string | null
     icon?: StringFieldUpdateOperationsInput | string
     description?: NullableStringFieldUpdateOperationsInput | string | null
-    game?: StringFieldUpdateOperationsInput | string
-    rarity?: EnumItemRarityFieldUpdateOperationsInput | $Enums.ItemRarity
+    game?: EnumGameFieldUpdateOperationsInput | $Enums.Game
   }
 
   export type StringFilter<$PrismaModel = never> = {
@@ -10311,18 +10309,11 @@ export namespace Prisma {
     _max?: NestedEnumPaymentStatusFilter<$PrismaModel>
   }
 
-  export type EnumItemTypeFilter<$PrismaModel = never> = {
-    equals?: $Enums.ItemType | EnumItemTypeFieldRefInput<$PrismaModel>
-    in?: $Enums.ItemType[] | ListEnumItemTypeFieldRefInput<$PrismaModel>
-    notIn?: $Enums.ItemType[] | ListEnumItemTypeFieldRefInput<$PrismaModel>
-    not?: NestedEnumItemTypeFilter<$PrismaModel> | $Enums.ItemType
-  }
-
-  export type EnumItemRarityFilter<$PrismaModel = never> = {
-    equals?: $Enums.ItemRarity | EnumItemRarityFieldRefInput<$PrismaModel>
-    in?: $Enums.ItemRarity[] | ListEnumItemRarityFieldRefInput<$PrismaModel>
-    notIn?: $Enums.ItemRarity[] | ListEnumItemRarityFieldRefInput<$PrismaModel>
-    not?: NestedEnumItemRarityFilter<$PrismaModel> | $Enums.ItemRarity
+  export type EnumGameFilter<$PrismaModel = never> = {
+    equals?: $Enums.Game | EnumGameFieldRefInput<$PrismaModel>
+    in?: $Enums.Game[] | ListEnumGameFieldRefInput<$PrismaModel>
+    notIn?: $Enums.Game[] | ListEnumGameFieldRefInput<$PrismaModel>
+    not?: NestedEnumGameFilter<$PrismaModel> | $Enums.Game
   }
 
   export type ItemCountOrderByAggregateInput = {
@@ -10332,10 +10323,10 @@ export namespace Prisma {
     sale?: SortOrder
     availability?: SortOrder
     type?: SortOrder
+    rarity?: SortOrder
     icon?: SortOrder
     description?: SortOrder
     game?: SortOrder
-    rarity?: SortOrder
   }
 
   export type ItemAvgOrderByAggregateInput = {
@@ -10351,10 +10342,10 @@ export namespace Prisma {
     sale?: SortOrder
     availability?: SortOrder
     type?: SortOrder
+    rarity?: SortOrder
     icon?: SortOrder
     description?: SortOrder
     game?: SortOrder
-    rarity?: SortOrder
   }
 
   export type ItemMinOrderByAggregateInput = {
@@ -10364,10 +10355,10 @@ export namespace Prisma {
     sale?: SortOrder
     availability?: SortOrder
     type?: SortOrder
+    rarity?: SortOrder
     icon?: SortOrder
     description?: SortOrder
     game?: SortOrder
-    rarity?: SortOrder
   }
 
   export type ItemSumOrderByAggregateInput = {
@@ -10376,24 +10367,14 @@ export namespace Prisma {
     sale?: SortOrder
   }
 
-  export type EnumItemTypeWithAggregatesFilter<$PrismaModel = never> = {
-    equals?: $Enums.ItemType | EnumItemTypeFieldRefInput<$PrismaModel>
-    in?: $Enums.ItemType[] | ListEnumItemTypeFieldRefInput<$PrismaModel>
-    notIn?: $Enums.ItemType[] | ListEnumItemTypeFieldRefInput<$PrismaModel>
-    not?: NestedEnumItemTypeWithAggregatesFilter<$PrismaModel> | $Enums.ItemType
+  export type EnumGameWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.Game | EnumGameFieldRefInput<$PrismaModel>
+    in?: $Enums.Game[] | ListEnumGameFieldRefInput<$PrismaModel>
+    notIn?: $Enums.Game[] | ListEnumGameFieldRefInput<$PrismaModel>
+    not?: NestedEnumGameWithAggregatesFilter<$PrismaModel> | $Enums.Game
     _count?: NestedIntFilter<$PrismaModel>
-    _min?: NestedEnumItemTypeFilter<$PrismaModel>
-    _max?: NestedEnumItemTypeFilter<$PrismaModel>
-  }
-
-  export type EnumItemRarityWithAggregatesFilter<$PrismaModel = never> = {
-    equals?: $Enums.ItemRarity | EnumItemRarityFieldRefInput<$PrismaModel>
-    in?: $Enums.ItemRarity[] | ListEnumItemRarityFieldRefInput<$PrismaModel>
-    notIn?: $Enums.ItemRarity[] | ListEnumItemRarityFieldRefInput<$PrismaModel>
-    not?: NestedEnumItemRarityWithAggregatesFilter<$PrismaModel> | $Enums.ItemRarity
-    _count?: NestedIntFilter<$PrismaModel>
-    _min?: NestedEnumItemRarityFilter<$PrismaModel>
-    _max?: NestedEnumItemRarityFilter<$PrismaModel>
+    _min?: NestedEnumGameFilter<$PrismaModel>
+    _max?: NestedEnumGameFilter<$PrismaModel>
   }
 
   export type PaymentCreateNestedManyWithoutUsersInput = {
@@ -10714,12 +10695,8 @@ export namespace Prisma {
     connect?: UserItemWhereUniqueInput | UserItemWhereUniqueInput[]
   }
 
-  export type EnumItemTypeFieldUpdateOperationsInput = {
-    set?: $Enums.ItemType
-  }
-
-  export type EnumItemRarityFieldUpdateOperationsInput = {
-    set?: $Enums.ItemRarity
+  export type EnumGameFieldUpdateOperationsInput = {
+    set?: $Enums.Game
   }
 
   export type UserItemUpdateManyWithoutItemNestedInput = {
@@ -11070,38 +11047,21 @@ export namespace Prisma {
     _max?: NestedEnumPaymentStatusFilter<$PrismaModel>
   }
 
-  export type NestedEnumItemTypeFilter<$PrismaModel = never> = {
-    equals?: $Enums.ItemType | EnumItemTypeFieldRefInput<$PrismaModel>
-    in?: $Enums.ItemType[] | ListEnumItemTypeFieldRefInput<$PrismaModel>
-    notIn?: $Enums.ItemType[] | ListEnumItemTypeFieldRefInput<$PrismaModel>
-    not?: NestedEnumItemTypeFilter<$PrismaModel> | $Enums.ItemType
+  export type NestedEnumGameFilter<$PrismaModel = never> = {
+    equals?: $Enums.Game | EnumGameFieldRefInput<$PrismaModel>
+    in?: $Enums.Game[] | ListEnumGameFieldRefInput<$PrismaModel>
+    notIn?: $Enums.Game[] | ListEnumGameFieldRefInput<$PrismaModel>
+    not?: NestedEnumGameFilter<$PrismaModel> | $Enums.Game
   }
 
-  export type NestedEnumItemRarityFilter<$PrismaModel = never> = {
-    equals?: $Enums.ItemRarity | EnumItemRarityFieldRefInput<$PrismaModel>
-    in?: $Enums.ItemRarity[] | ListEnumItemRarityFieldRefInput<$PrismaModel>
-    notIn?: $Enums.ItemRarity[] | ListEnumItemRarityFieldRefInput<$PrismaModel>
-    not?: NestedEnumItemRarityFilter<$PrismaModel> | $Enums.ItemRarity
-  }
-
-  export type NestedEnumItemTypeWithAggregatesFilter<$PrismaModel = never> = {
-    equals?: $Enums.ItemType | EnumItemTypeFieldRefInput<$PrismaModel>
-    in?: $Enums.ItemType[] | ListEnumItemTypeFieldRefInput<$PrismaModel>
-    notIn?: $Enums.ItemType[] | ListEnumItemTypeFieldRefInput<$PrismaModel>
-    not?: NestedEnumItemTypeWithAggregatesFilter<$PrismaModel> | $Enums.ItemType
+  export type NestedEnumGameWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.Game | EnumGameFieldRefInput<$PrismaModel>
+    in?: $Enums.Game[] | ListEnumGameFieldRefInput<$PrismaModel>
+    notIn?: $Enums.Game[] | ListEnumGameFieldRefInput<$PrismaModel>
+    not?: NestedEnumGameWithAggregatesFilter<$PrismaModel> | $Enums.Game
     _count?: NestedIntFilter<$PrismaModel>
-    _min?: NestedEnumItemTypeFilter<$PrismaModel>
-    _max?: NestedEnumItemTypeFilter<$PrismaModel>
-  }
-
-  export type NestedEnumItemRarityWithAggregatesFilter<$PrismaModel = never> = {
-    equals?: $Enums.ItemRarity | EnumItemRarityFieldRefInput<$PrismaModel>
-    in?: $Enums.ItemRarity[] | ListEnumItemRarityFieldRefInput<$PrismaModel>
-    notIn?: $Enums.ItemRarity[] | ListEnumItemRarityFieldRefInput<$PrismaModel>
-    not?: NestedEnumItemRarityWithAggregatesFilter<$PrismaModel> | $Enums.ItemRarity
-    _count?: NestedIntFilter<$PrismaModel>
-    _min?: NestedEnumItemRarityFilter<$PrismaModel>
-    _max?: NestedEnumItemRarityFilter<$PrismaModel>
+    _min?: NestedEnumGameFilter<$PrismaModel>
+    _max?: NestedEnumGameFilter<$PrismaModel>
   }
 
   export type PaymentCreateWithoutUsersInput = {
@@ -11328,11 +11288,11 @@ export namespace Prisma {
     price: number
     sale?: number | null
     availability?: boolean
-    type: $Enums.ItemType
+    type?: string | null
+    rarity?: string | null
     icon: string
     description?: string | null
-    game?: string
-    rarity: $Enums.ItemRarity
+    game?: $Enums.Game
   }
 
   export type ItemUncheckedCreateWithoutUsersInput = {
@@ -11341,11 +11301,11 @@ export namespace Prisma {
     price: number
     sale?: number | null
     availability?: boolean
-    type: $Enums.ItemType
+    type?: string | null
+    rarity?: string | null
     icon: string
     description?: string | null
-    game?: string
-    rarity: $Enums.ItemRarity
+    game?: $Enums.Game
   }
 
   export type ItemCreateOrConnectWithoutUsersInput = {
@@ -11434,11 +11394,11 @@ export namespace Prisma {
     price?: IntFieldUpdateOperationsInput | number
     sale?: NullableIntFieldUpdateOperationsInput | number | null
     availability?: BoolFieldUpdateOperationsInput | boolean
-    type?: EnumItemTypeFieldUpdateOperationsInput | $Enums.ItemType
+    type?: NullableStringFieldUpdateOperationsInput | string | null
+    rarity?: NullableStringFieldUpdateOperationsInput | string | null
     icon?: StringFieldUpdateOperationsInput | string
     description?: NullableStringFieldUpdateOperationsInput | string | null
-    game?: StringFieldUpdateOperationsInput | string
-    rarity?: EnumItemRarityFieldUpdateOperationsInput | $Enums.ItemRarity
+    game?: EnumGameFieldUpdateOperationsInput | $Enums.Game
   }
 
   export type ItemUncheckedUpdateWithoutUsersInput = {
@@ -11447,11 +11407,11 @@ export namespace Prisma {
     price?: IntFieldUpdateOperationsInput | number
     sale?: NullableIntFieldUpdateOperationsInput | number | null
     availability?: BoolFieldUpdateOperationsInput | boolean
-    type?: EnumItemTypeFieldUpdateOperationsInput | $Enums.ItemType
+    type?: NullableStringFieldUpdateOperationsInput | string | null
+    rarity?: NullableStringFieldUpdateOperationsInput | string | null
     icon?: StringFieldUpdateOperationsInput | string
     description?: NullableStringFieldUpdateOperationsInput | string | null
-    game?: StringFieldUpdateOperationsInput | string
-    rarity?: EnumItemRarityFieldUpdateOperationsInput | $Enums.ItemRarity
+    game?: EnumGameFieldUpdateOperationsInput | $Enums.Game
   }
 
   export type OrderUpsertWithoutItemsInput = {
