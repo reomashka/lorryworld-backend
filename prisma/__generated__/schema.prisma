@@ -93,17 +93,19 @@ model Payment {
 }
 
 model Item {
-  id           Int        @id @default(autoincrement())
+  id           Int     @id @default(autoincrement())
   name         String
   price        Int
   sale         Int?
-  availability Boolean    @default(true)
+  availability Boolean @default(true)
   type         String?
   rarity       String?
-  icon         String
-  description  String?
-  game         Game       @default(MM)
-  users        UserItem[]
+
+  description String?
+  icon        String
+
+  game  Game       @default(MM)
+  users UserItem[]
 
   @@map("items")
 }

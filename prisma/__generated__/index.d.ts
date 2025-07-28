@@ -7333,8 +7333,8 @@ export namespace Prisma {
     availability: boolean | null
     type: string | null
     rarity: string | null
-    icon: string | null
     description: string | null
+    icon: string | null
     game: $Enums.Game | null
   }
 
@@ -7346,8 +7346,8 @@ export namespace Prisma {
     availability: boolean | null
     type: string | null
     rarity: string | null
-    icon: string | null
     description: string | null
+    icon: string | null
     game: $Enums.Game | null
   }
 
@@ -7359,8 +7359,8 @@ export namespace Prisma {
     availability: number
     type: number
     rarity: number
-    icon: number
     description: number
+    icon: number
     game: number
     _all: number
   }
@@ -7386,8 +7386,8 @@ export namespace Prisma {
     availability?: true
     type?: true
     rarity?: true
-    icon?: true
     description?: true
+    icon?: true
     game?: true
   }
 
@@ -7399,8 +7399,8 @@ export namespace Prisma {
     availability?: true
     type?: true
     rarity?: true
-    icon?: true
     description?: true
+    icon?: true
     game?: true
   }
 
@@ -7412,8 +7412,8 @@ export namespace Prisma {
     availability?: true
     type?: true
     rarity?: true
-    icon?: true
     description?: true
+    icon?: true
     game?: true
     _all?: true
   }
@@ -7512,8 +7512,8 @@ export namespace Prisma {
     availability: boolean
     type: string | null
     rarity: string | null
-    icon: string
     description: string | null
+    icon: string
     game: $Enums.Game
     _count: ItemCountAggregateOutputType | null
     _avg: ItemAvgAggregateOutputType | null
@@ -7544,8 +7544,8 @@ export namespace Prisma {
     availability?: boolean
     type?: boolean
     rarity?: boolean
-    icon?: boolean
     description?: boolean
+    icon?: boolean
     game?: boolean
     users?: boolean | Item$usersArgs<ExtArgs>
     _count?: boolean | ItemCountOutputTypeDefaultArgs<ExtArgs>
@@ -7559,8 +7559,8 @@ export namespace Prisma {
     availability?: boolean
     type?: boolean
     rarity?: boolean
-    icon?: boolean
     description?: boolean
+    icon?: boolean
     game?: boolean
   }, ExtArgs["result"]["item"]>
 
@@ -7572,8 +7572,8 @@ export namespace Prisma {
     availability?: boolean
     type?: boolean
     rarity?: boolean
-    icon?: boolean
     description?: boolean
+    icon?: boolean
     game?: boolean
   }, ExtArgs["result"]["item"]>
 
@@ -7585,12 +7585,12 @@ export namespace Prisma {
     availability?: boolean
     type?: boolean
     rarity?: boolean
-    icon?: boolean
     description?: boolean
+    icon?: boolean
     game?: boolean
   }
 
-  export type ItemOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "name" | "price" | "sale" | "availability" | "type" | "rarity" | "icon" | "description" | "game", ExtArgs["result"]["item"]>
+  export type ItemOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "name" | "price" | "sale" | "availability" | "type" | "rarity" | "description" | "icon" | "game", ExtArgs["result"]["item"]>
   export type ItemInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     users?: boolean | Item$usersArgs<ExtArgs>
     _count?: boolean | ItemCountOutputTypeDefaultArgs<ExtArgs>
@@ -7611,8 +7611,8 @@ export namespace Prisma {
       availability: boolean
       type: string | null
       rarity: string | null
-      icon: string
       description: string | null
+      icon: string
       game: $Enums.Game
     }, ExtArgs["result"]["item"]>
     composites: {}
@@ -8045,8 +8045,8 @@ export namespace Prisma {
     readonly availability: FieldRef<"Item", 'Boolean'>
     readonly type: FieldRef<"Item", 'String'>
     readonly rarity: FieldRef<"Item", 'String'>
-    readonly icon: FieldRef<"Item", 'String'>
     readonly description: FieldRef<"Item", 'String'>
+    readonly icon: FieldRef<"Item", 'String'>
     readonly game: FieldRef<"Item", 'Game'>
   }
     
@@ -8572,8 +8572,8 @@ export namespace Prisma {
     availability: 'availability',
     type: 'type',
     rarity: 'rarity',
-    icon: 'icon',
     description: 'description',
+    icon: 'icon',
     game: 'game'
   };
 
@@ -9178,8 +9178,8 @@ export namespace Prisma {
     availability?: BoolFilter<"Item"> | boolean
     type?: StringNullableFilter<"Item"> | string | null
     rarity?: StringNullableFilter<"Item"> | string | null
-    icon?: StringFilter<"Item"> | string
     description?: StringNullableFilter<"Item"> | string | null
+    icon?: StringFilter<"Item"> | string
     game?: EnumGameFilter<"Item"> | $Enums.Game
     users?: UserItemListRelationFilter
   }
@@ -9192,8 +9192,8 @@ export namespace Prisma {
     availability?: SortOrder
     type?: SortOrderInput | SortOrder
     rarity?: SortOrderInput | SortOrder
-    icon?: SortOrder
     description?: SortOrderInput | SortOrder
+    icon?: SortOrder
     game?: SortOrder
     users?: UserItemOrderByRelationAggregateInput
   }
@@ -9209,8 +9209,8 @@ export namespace Prisma {
     availability?: BoolFilter<"Item"> | boolean
     type?: StringNullableFilter<"Item"> | string | null
     rarity?: StringNullableFilter<"Item"> | string | null
-    icon?: StringFilter<"Item"> | string
     description?: StringNullableFilter<"Item"> | string | null
+    icon?: StringFilter<"Item"> | string
     game?: EnumGameFilter<"Item"> | $Enums.Game
     users?: UserItemListRelationFilter
   }, "id">
@@ -9223,8 +9223,8 @@ export namespace Prisma {
     availability?: SortOrder
     type?: SortOrderInput | SortOrder
     rarity?: SortOrderInput | SortOrder
-    icon?: SortOrder
     description?: SortOrderInput | SortOrder
+    icon?: SortOrder
     game?: SortOrder
     _count?: ItemCountOrderByAggregateInput
     _avg?: ItemAvgOrderByAggregateInput
@@ -9244,8 +9244,8 @@ export namespace Prisma {
     availability?: BoolWithAggregatesFilter<"Item"> | boolean
     type?: StringNullableWithAggregatesFilter<"Item"> | string | null
     rarity?: StringNullableWithAggregatesFilter<"Item"> | string | null
-    icon?: StringWithAggregatesFilter<"Item"> | string
     description?: StringNullableWithAggregatesFilter<"Item"> | string | null
+    icon?: StringWithAggregatesFilter<"Item"> | string
     game?: EnumGameWithAggregatesFilter<"Item"> | $Enums.Game
   }
 
@@ -9663,8 +9663,8 @@ export namespace Prisma {
     availability?: boolean
     type?: string | null
     rarity?: string | null
-    icon: string
     description?: string | null
+    icon: string
     game?: $Enums.Game
     users?: UserItemCreateNestedManyWithoutItemInput
   }
@@ -9677,8 +9677,8 @@ export namespace Prisma {
     availability?: boolean
     type?: string | null
     rarity?: string | null
-    icon: string
     description?: string | null
+    icon: string
     game?: $Enums.Game
     users?: UserItemUncheckedCreateNestedManyWithoutItemInput
   }
@@ -9690,8 +9690,8 @@ export namespace Prisma {
     availability?: BoolFieldUpdateOperationsInput | boolean
     type?: NullableStringFieldUpdateOperationsInput | string | null
     rarity?: NullableStringFieldUpdateOperationsInput | string | null
-    icon?: StringFieldUpdateOperationsInput | string
     description?: NullableStringFieldUpdateOperationsInput | string | null
+    icon?: StringFieldUpdateOperationsInput | string
     game?: EnumGameFieldUpdateOperationsInput | $Enums.Game
     users?: UserItemUpdateManyWithoutItemNestedInput
   }
@@ -9704,8 +9704,8 @@ export namespace Prisma {
     availability?: BoolFieldUpdateOperationsInput | boolean
     type?: NullableStringFieldUpdateOperationsInput | string | null
     rarity?: NullableStringFieldUpdateOperationsInput | string | null
-    icon?: StringFieldUpdateOperationsInput | string
     description?: NullableStringFieldUpdateOperationsInput | string | null
+    icon?: StringFieldUpdateOperationsInput | string
     game?: EnumGameFieldUpdateOperationsInput | $Enums.Game
     users?: UserItemUncheckedUpdateManyWithoutItemNestedInput
   }
@@ -9718,8 +9718,8 @@ export namespace Prisma {
     availability?: boolean
     type?: string | null
     rarity?: string | null
-    icon: string
     description?: string | null
+    icon: string
     game?: $Enums.Game
   }
 
@@ -9730,8 +9730,8 @@ export namespace Prisma {
     availability?: BoolFieldUpdateOperationsInput | boolean
     type?: NullableStringFieldUpdateOperationsInput | string | null
     rarity?: NullableStringFieldUpdateOperationsInput | string | null
-    icon?: StringFieldUpdateOperationsInput | string
     description?: NullableStringFieldUpdateOperationsInput | string | null
+    icon?: StringFieldUpdateOperationsInput | string
     game?: EnumGameFieldUpdateOperationsInput | $Enums.Game
   }
 
@@ -9743,8 +9743,8 @@ export namespace Prisma {
     availability?: BoolFieldUpdateOperationsInput | boolean
     type?: NullableStringFieldUpdateOperationsInput | string | null
     rarity?: NullableStringFieldUpdateOperationsInput | string | null
-    icon?: StringFieldUpdateOperationsInput | string
     description?: NullableStringFieldUpdateOperationsInput | string | null
+    icon?: StringFieldUpdateOperationsInput | string
     game?: EnumGameFieldUpdateOperationsInput | $Enums.Game
   }
 
@@ -10324,8 +10324,8 @@ export namespace Prisma {
     availability?: SortOrder
     type?: SortOrder
     rarity?: SortOrder
-    icon?: SortOrder
     description?: SortOrder
+    icon?: SortOrder
     game?: SortOrder
   }
 
@@ -10343,8 +10343,8 @@ export namespace Prisma {
     availability?: SortOrder
     type?: SortOrder
     rarity?: SortOrder
-    icon?: SortOrder
     description?: SortOrder
+    icon?: SortOrder
     game?: SortOrder
   }
 
@@ -10356,8 +10356,8 @@ export namespace Prisma {
     availability?: SortOrder
     type?: SortOrder
     rarity?: SortOrder
-    icon?: SortOrder
     description?: SortOrder
+    icon?: SortOrder
     game?: SortOrder
   }
 
@@ -11290,8 +11290,8 @@ export namespace Prisma {
     availability?: boolean
     type?: string | null
     rarity?: string | null
-    icon: string
     description?: string | null
+    icon: string
     game?: $Enums.Game
   }
 
@@ -11303,8 +11303,8 @@ export namespace Prisma {
     availability?: boolean
     type?: string | null
     rarity?: string | null
-    icon: string
     description?: string | null
+    icon: string
     game?: $Enums.Game
   }
 
@@ -11396,8 +11396,8 @@ export namespace Prisma {
     availability?: BoolFieldUpdateOperationsInput | boolean
     type?: NullableStringFieldUpdateOperationsInput | string | null
     rarity?: NullableStringFieldUpdateOperationsInput | string | null
-    icon?: StringFieldUpdateOperationsInput | string
     description?: NullableStringFieldUpdateOperationsInput | string | null
+    icon?: StringFieldUpdateOperationsInput | string
     game?: EnumGameFieldUpdateOperationsInput | $Enums.Game
   }
 
@@ -11409,8 +11409,8 @@ export namespace Prisma {
     availability?: BoolFieldUpdateOperationsInput | boolean
     type?: NullableStringFieldUpdateOperationsInput | string | null
     rarity?: NullableStringFieldUpdateOperationsInput | string | null
-    icon?: StringFieldUpdateOperationsInput | string
     description?: NullableStringFieldUpdateOperationsInput | string | null
+    icon?: StringFieldUpdateOperationsInput | string
     game?: EnumGameFieldUpdateOperationsInput | $Enums.Game
   }
 
