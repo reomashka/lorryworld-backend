@@ -37,6 +37,8 @@ export class TelegramService {
 				return
 			}
 
+			console.log('Sending Telegram to chat:', chatId)
+
 			const body: any = {
 				chat_id: chatId,
 				parse_mode: 'HTML',
