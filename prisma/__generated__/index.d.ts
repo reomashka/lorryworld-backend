@@ -48,15 +48,7 @@ export type Item = $Result.DefaultSelection<Prisma.$ItemPayload>
  * Enums
  */
 export namespace $Enums {
-  export const Game: {
-  MM: 'MM',
-  GAG: 'GAG'
-};
-
-export type Game = (typeof Game)[keyof typeof Game]
-
-
-export const MediaContactType: {
+  export const MediaContactType: {
   TELEGRAM: 'TELEGRAM',
   VK: 'VK',
   EMAIL: 'EMAIL'
@@ -141,10 +133,6 @@ export const TokenType: {
 export type TokenType = (typeof TokenType)[keyof typeof TokenType]
 
 }
-
-export type Game = $Enums.Game
-
-export const Game: typeof $Enums.Game
 
 export type MediaContactType = $Enums.MediaContactType
 
@@ -7335,7 +7323,7 @@ export namespace Prisma {
     rarity: string | null
     description: string | null
     icon: string | null
-    game: $Enums.Game | null
+    game: string | null
   }
 
   export type ItemMaxAggregateOutputType = {
@@ -7348,7 +7336,7 @@ export namespace Prisma {
     rarity: string | null
     description: string | null
     icon: string | null
-    game: $Enums.Game | null
+    game: string | null
   }
 
   export type ItemCountAggregateOutputType = {
@@ -7514,7 +7502,7 @@ export namespace Prisma {
     rarity: string | null
     description: string | null
     icon: string
-    game: $Enums.Game
+    game: string | null
     _count: ItemCountAggregateOutputType | null
     _avg: ItemAvgAggregateOutputType | null
     _sum: ItemSumAggregateOutputType | null
@@ -7613,7 +7601,7 @@ export namespace Prisma {
       rarity: string | null
       description: string | null
       icon: string
-      game: $Enums.Game
+      game: string | null
     }, ExtArgs["result"]["item"]>
     composites: {}
   }
@@ -8047,7 +8035,7 @@ export namespace Prisma {
     readonly rarity: FieldRef<"Item", 'String'>
     readonly description: FieldRef<"Item", 'String'>
     readonly icon: FieldRef<"Item", 'String'>
-    readonly game: FieldRef<"Item", 'Game'>
+    readonly game: FieldRef<"Item", 'String'>
   }
     
 
@@ -8757,20 +8745,6 @@ export namespace Prisma {
 
 
   /**
-   * Reference to a field of type 'Game'
-   */
-  export type EnumGameFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Game'>
-    
-
-
-  /**
-   * Reference to a field of type 'Game[]'
-   */
-  export type ListEnumGameFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Game[]'>
-    
-
-
-  /**
    * Reference to a field of type 'Float'
    */
   export type FloatFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Float'>
@@ -9180,7 +9154,7 @@ export namespace Prisma {
     rarity?: StringNullableFilter<"Item"> | string | null
     description?: StringNullableFilter<"Item"> | string | null
     icon?: StringFilter<"Item"> | string
-    game?: EnumGameFilter<"Item"> | $Enums.Game
+    game?: StringNullableFilter<"Item"> | string | null
     users?: UserItemListRelationFilter
   }
 
@@ -9194,7 +9168,7 @@ export namespace Prisma {
     rarity?: SortOrderInput | SortOrder
     description?: SortOrderInput | SortOrder
     icon?: SortOrder
-    game?: SortOrder
+    game?: SortOrderInput | SortOrder
     users?: UserItemOrderByRelationAggregateInput
   }
 
@@ -9211,7 +9185,7 @@ export namespace Prisma {
     rarity?: StringNullableFilter<"Item"> | string | null
     description?: StringNullableFilter<"Item"> | string | null
     icon?: StringFilter<"Item"> | string
-    game?: EnumGameFilter<"Item"> | $Enums.Game
+    game?: StringNullableFilter<"Item"> | string | null
     users?: UserItemListRelationFilter
   }, "id">
 
@@ -9225,7 +9199,7 @@ export namespace Prisma {
     rarity?: SortOrderInput | SortOrder
     description?: SortOrderInput | SortOrder
     icon?: SortOrder
-    game?: SortOrder
+    game?: SortOrderInput | SortOrder
     _count?: ItemCountOrderByAggregateInput
     _avg?: ItemAvgOrderByAggregateInput
     _max?: ItemMaxOrderByAggregateInput
@@ -9246,7 +9220,7 @@ export namespace Prisma {
     rarity?: StringNullableWithAggregatesFilter<"Item"> | string | null
     description?: StringNullableWithAggregatesFilter<"Item"> | string | null
     icon?: StringWithAggregatesFilter<"Item"> | string
-    game?: EnumGameWithAggregatesFilter<"Item"> | $Enums.Game
+    game?: StringNullableWithAggregatesFilter<"Item"> | string | null
   }
 
   export type UserCreateInput = {
@@ -9665,7 +9639,7 @@ export namespace Prisma {
     rarity?: string | null
     description?: string | null
     icon: string
-    game?: $Enums.Game
+    game?: string | null
     users?: UserItemCreateNestedManyWithoutItemInput
   }
 
@@ -9679,7 +9653,7 @@ export namespace Prisma {
     rarity?: string | null
     description?: string | null
     icon: string
-    game?: $Enums.Game
+    game?: string | null
     users?: UserItemUncheckedCreateNestedManyWithoutItemInput
   }
 
@@ -9692,7 +9666,7 @@ export namespace Prisma {
     rarity?: NullableStringFieldUpdateOperationsInput | string | null
     description?: NullableStringFieldUpdateOperationsInput | string | null
     icon?: StringFieldUpdateOperationsInput | string
-    game?: EnumGameFieldUpdateOperationsInput | $Enums.Game
+    game?: NullableStringFieldUpdateOperationsInput | string | null
     users?: UserItemUpdateManyWithoutItemNestedInput
   }
 
@@ -9706,7 +9680,7 @@ export namespace Prisma {
     rarity?: NullableStringFieldUpdateOperationsInput | string | null
     description?: NullableStringFieldUpdateOperationsInput | string | null
     icon?: StringFieldUpdateOperationsInput | string
-    game?: EnumGameFieldUpdateOperationsInput | $Enums.Game
+    game?: NullableStringFieldUpdateOperationsInput | string | null
     users?: UserItemUncheckedUpdateManyWithoutItemNestedInput
   }
 
@@ -9720,7 +9694,7 @@ export namespace Prisma {
     rarity?: string | null
     description?: string | null
     icon: string
-    game?: $Enums.Game
+    game?: string | null
   }
 
   export type ItemUpdateManyMutationInput = {
@@ -9732,7 +9706,7 @@ export namespace Prisma {
     rarity?: NullableStringFieldUpdateOperationsInput | string | null
     description?: NullableStringFieldUpdateOperationsInput | string | null
     icon?: StringFieldUpdateOperationsInput | string
-    game?: EnumGameFieldUpdateOperationsInput | $Enums.Game
+    game?: NullableStringFieldUpdateOperationsInput | string | null
   }
 
   export type ItemUncheckedUpdateManyInput = {
@@ -9745,7 +9719,7 @@ export namespace Prisma {
     rarity?: NullableStringFieldUpdateOperationsInput | string | null
     description?: NullableStringFieldUpdateOperationsInput | string | null
     icon?: StringFieldUpdateOperationsInput | string
-    game?: EnumGameFieldUpdateOperationsInput | $Enums.Game
+    game?: NullableStringFieldUpdateOperationsInput | string | null
   }
 
   export type StringFilter<$PrismaModel = never> = {
@@ -10309,13 +10283,6 @@ export namespace Prisma {
     _max?: NestedEnumPaymentStatusFilter<$PrismaModel>
   }
 
-  export type EnumGameFilter<$PrismaModel = never> = {
-    equals?: $Enums.Game | EnumGameFieldRefInput<$PrismaModel>
-    in?: $Enums.Game[] | ListEnumGameFieldRefInput<$PrismaModel>
-    notIn?: $Enums.Game[] | ListEnumGameFieldRefInput<$PrismaModel>
-    not?: NestedEnumGameFilter<$PrismaModel> | $Enums.Game
-  }
-
   export type ItemCountOrderByAggregateInput = {
     id?: SortOrder
     name?: SortOrder
@@ -10365,16 +10332,6 @@ export namespace Prisma {
     id?: SortOrder
     price?: SortOrder
     sale?: SortOrder
-  }
-
-  export type EnumGameWithAggregatesFilter<$PrismaModel = never> = {
-    equals?: $Enums.Game | EnumGameFieldRefInput<$PrismaModel>
-    in?: $Enums.Game[] | ListEnumGameFieldRefInput<$PrismaModel>
-    notIn?: $Enums.Game[] | ListEnumGameFieldRefInput<$PrismaModel>
-    not?: NestedEnumGameWithAggregatesFilter<$PrismaModel> | $Enums.Game
-    _count?: NestedIntFilter<$PrismaModel>
-    _min?: NestedEnumGameFilter<$PrismaModel>
-    _max?: NestedEnumGameFilter<$PrismaModel>
   }
 
   export type PaymentCreateNestedManyWithoutUsersInput = {
@@ -10693,10 +10650,6 @@ export namespace Prisma {
     connectOrCreate?: UserItemCreateOrConnectWithoutItemInput | UserItemCreateOrConnectWithoutItemInput[]
     createMany?: UserItemCreateManyItemInputEnvelope
     connect?: UserItemWhereUniqueInput | UserItemWhereUniqueInput[]
-  }
-
-  export type EnumGameFieldUpdateOperationsInput = {
-    set?: $Enums.Game
   }
 
   export type UserItemUpdateManyWithoutItemNestedInput = {
@@ -11047,23 +11000,6 @@ export namespace Prisma {
     _max?: NestedEnumPaymentStatusFilter<$PrismaModel>
   }
 
-  export type NestedEnumGameFilter<$PrismaModel = never> = {
-    equals?: $Enums.Game | EnumGameFieldRefInput<$PrismaModel>
-    in?: $Enums.Game[] | ListEnumGameFieldRefInput<$PrismaModel>
-    notIn?: $Enums.Game[] | ListEnumGameFieldRefInput<$PrismaModel>
-    not?: NestedEnumGameFilter<$PrismaModel> | $Enums.Game
-  }
-
-  export type NestedEnumGameWithAggregatesFilter<$PrismaModel = never> = {
-    equals?: $Enums.Game | EnumGameFieldRefInput<$PrismaModel>
-    in?: $Enums.Game[] | ListEnumGameFieldRefInput<$PrismaModel>
-    notIn?: $Enums.Game[] | ListEnumGameFieldRefInput<$PrismaModel>
-    not?: NestedEnumGameWithAggregatesFilter<$PrismaModel> | $Enums.Game
-    _count?: NestedIntFilter<$PrismaModel>
-    _min?: NestedEnumGameFilter<$PrismaModel>
-    _max?: NestedEnumGameFilter<$PrismaModel>
-  }
-
   export type PaymentCreateWithoutUsersInput = {
     id?: string
     amount: number
@@ -11292,7 +11228,7 @@ export namespace Prisma {
     rarity?: string | null
     description?: string | null
     icon: string
-    game?: $Enums.Game
+    game?: string | null
   }
 
   export type ItemUncheckedCreateWithoutUsersInput = {
@@ -11305,7 +11241,7 @@ export namespace Prisma {
     rarity?: string | null
     description?: string | null
     icon: string
-    game?: $Enums.Game
+    game?: string | null
   }
 
   export type ItemCreateOrConnectWithoutUsersInput = {
@@ -11398,7 +11334,7 @@ export namespace Prisma {
     rarity?: NullableStringFieldUpdateOperationsInput | string | null
     description?: NullableStringFieldUpdateOperationsInput | string | null
     icon?: StringFieldUpdateOperationsInput | string
-    game?: EnumGameFieldUpdateOperationsInput | $Enums.Game
+    game?: NullableStringFieldUpdateOperationsInput | string | null
   }
 
   export type ItemUncheckedUpdateWithoutUsersInput = {
@@ -11411,7 +11347,7 @@ export namespace Prisma {
     rarity?: NullableStringFieldUpdateOperationsInput | string | null
     description?: NullableStringFieldUpdateOperationsInput | string | null
     icon?: StringFieldUpdateOperationsInput | string
-    game?: EnumGameFieldUpdateOperationsInput | $Enums.Game
+    game?: NullableStringFieldUpdateOperationsInput | string | null
   }
 
   export type OrderUpsertWithoutItemsInput = {

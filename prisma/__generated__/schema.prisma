@@ -104,15 +104,10 @@ model Item {
   description String?
   icon        String
 
-  game  Game       @default(MM)
+  game  String?
   users UserItem[]
 
   @@map("items")
-}
-
-enum Game {
-  MM
-  GAG
 }
 
 enum MediaContactType {

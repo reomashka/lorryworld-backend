@@ -247,11 +247,6 @@ exports.PaymentStatus = exports.$Enums.PaymentStatus = {
   UNKNOWN: 'UNKNOWN'
 };
 
-exports.Game = exports.$Enums.Game = {
-  MM: 'MM',
-  GAG: 'GAG'
-};
-
 exports.Prisma.ModelName = {
   User: 'User',
   UserItem: 'UserItem',
