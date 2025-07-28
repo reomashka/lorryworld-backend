@@ -104,7 +104,7 @@ model Item {
   description String?
   icon        String
 
-  game  String?
+  game  String?    @default("MM")
   users UserItem[]
 
   @@map("items")
