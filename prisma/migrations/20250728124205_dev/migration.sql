@@ -1,11 +1,4 @@
-/*
-  Warnings:
 
-  - The `type` column on the `items` table would be dropped and recreated. This will lead to data loss if there is data in the column.
-  - The `game` column on the `items` table would be dropped and recreated. This will lead to data loss if there is data in the column.
-  - The `rarity` column on the `items` table would be dropped and recreated. This will lead to data loss if there is data in the column.
-
-*/
 -- Create enum
 CREATE TYPE "Game" AS ENUM ('MM', 'GAG');
 
