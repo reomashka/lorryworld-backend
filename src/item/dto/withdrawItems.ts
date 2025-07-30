@@ -4,4 +4,8 @@ export class WithdrawItemsDto {
 	@IsString()
 	@IsNotEmpty()
 	userId: string
+
+	@IsString()
+	@IsNotEmpty()
+	game: string
 }

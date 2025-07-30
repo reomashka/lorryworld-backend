@@ -91,34 +91,48 @@ export class ItemService {
 
 		return result
 	}
-
 	public async withdrawItem(dto: WithdrawItemsDto) {
 		const user = await this.prismaService.user.findUnique({
-			where: {
-				id: dto.userId
-			}
+			where: { id: dto.userId }
 		})
 
 		if (!user) {
-			throw new NotFoundException('user not found')
+			throw new NotFoundException('User not found')
 		}
 
-		const result = this.prismaService.$transaction(async prisma => {
+		const result = await this.prismaService.$transaction(async prisma => {
+			// 1. Найти все купленные предметы без привязки к заказу
+			const itemsToWithdraw = await prisma.userItem.findMany({
+				where: {
+					userId: dto.userId,
+					status: ItemStatus.PURCHASED,
+					orderId: null,
+					item: {
+						game: dto.game
+					}
+				}
+			})
+
+			if (itemsToWithdraw.length === 0) {
+				throw new BadRequestException(
+					'No items available for withdrawal'
+				)
+			}
+
+			// 2. Создать заказ
 			const order = await prisma.order.create({
 				data: {
 					userId: dto.userId,
 					isIssued: false
-				},
-				include: {
-					items: true
 				}
 			})
 
-			const userItem = await prisma.userItem.updateMany({
+			// 3. Обновить все userItem, добавив им orderId
+			const itemIds = itemsToWithdraw.map(item => item.id)
+
+			await prisma.userItem.updateMany({
 				where: {
-					userId: dto.userId,
-					status: ItemStatus.PURCHASED,
-					orderId: null
+					id: { in: itemIds }
 				},
 				data: {
 					status: ItemStatus.WITHDRAWN,
@@ -126,8 +140,12 @@ export class ItemService {
 				}
 			})
 
-			return { userItem, order }
+			return {
+				order,
+				items: itemsToWithdraw
+			}
 		})
+
 		return result
 	}
 
@@ -166,9 +184,11 @@ export class ItemService {
 				where: {
 					userId,
 					status: ItemStatus.WITHDRAWN,
-					isIssued: false
+					isIssued: false,
+					item: {
+						game: type
+					}
 				},
-
 				data: {
 					isIssued: true
 				}
