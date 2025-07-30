@@ -112,16 +112,22 @@ export class AdminService {
 	}
 
 	public async getStatsRegistrations(from: Date, to: Date) {
+		const nextDay = new Date(to)
+		nextDay.setDate(nextDay.getDate() + 1)
+
 		return this.prismaService.user.findMany({
 			where: {
 				createdAt: {
 					gte: from,
-					lte: to
+					lt: nextDay
 				}
 			},
 			select: {
 				id: true,
 				createdAt: true
+			},
+			orderBy: {
+				createdAt: 'asc'
 			}
 		})
 	}
