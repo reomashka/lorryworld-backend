@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Post } from '@nestjs/common'
+import { Body, Controller, Get, Post, Query } from '@nestjs/common'
 
 import { OrderService } from './order.service'
 
@@ -12,7 +12,12 @@ export class OrderController {
 	}
 
 	@Post('update-issued')
-	public async updateIssued(@Body() body: { orderId: number }) {
-		return this.orderService.updateIssuedStatus(body.orderId)
+	public async updateIssued(@Body() updates: { orderId: number }[]) {
+		return this.orderService.updateIssuedStatus(updates)
+	}
+
+	@Get('active')
+	public async getActiveOrders(@Query('userId') userId: string) {
+		return this.orderService.getActiveOrders(userId)
 	}
 }

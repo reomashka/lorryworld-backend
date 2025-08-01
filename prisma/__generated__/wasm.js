@@ -152,6 +152,7 @@ exports.Prisma.UserItemScalarFieldEnum = {
 exports.Prisma.OrderScalarFieldEnum = {
   id: 'id',
   userId: 'userId',
+  orderNumber: 'orderNumber',
   isIssued: 'isIssued',
   createdAt: 'createdAt'
 };

@@ -4042,15 +4042,18 @@ export namespace Prisma {
 
   export type OrderAvgAggregateOutputType = {
     id: number | null
+    orderNumber: number | null
   }
 
   export type OrderSumAggregateOutputType = {
     id: number | null
+    orderNumber: number | null
   }
 
   export type OrderMinAggregateOutputType = {
     id: number | null
     userId: string | null
+    orderNumber: number | null
     isIssued: boolean | null
     createdAt: Date | null
   }
@@ -4058,6 +4061,7 @@ export namespace Prisma {
   export type OrderMaxAggregateOutputType = {
     id: number | null
     userId: string | null
+    orderNumber: number | null
     isIssued: boolean | null
     createdAt: Date | null
   }
@@ -4065,6 +4069,7 @@ export namespace Prisma {
   export type OrderCountAggregateOutputType = {
     id: number
     userId: number
+    orderNumber: number
     isIssued: number
     createdAt: number
     _all: number
@@ -4073,15 +4078,18 @@ export namespace Prisma {
 
   export type OrderAvgAggregateInputType = {
     id?: true
+    orderNumber?: true
   }
 
   export type OrderSumAggregateInputType = {
     id?: true
+    orderNumber?: true
   }
 
   export type OrderMinAggregateInputType = {
     id?: true
     userId?: true
+    orderNumber?: true
     isIssued?: true
     createdAt?: true
   }
@@ -4089,6 +4097,7 @@ export namespace Prisma {
   export type OrderMaxAggregateInputType = {
     id?: true
     userId?: true
+    orderNumber?: true
     isIssued?: true
     createdAt?: true
   }
@@ -4096,6 +4105,7 @@ export namespace Prisma {
   export type OrderCountAggregateInputType = {
     id?: true
     userId?: true
+    orderNumber?: true
     isIssued?: true
     createdAt?: true
     _all?: true
@@ -4190,6 +4200,7 @@ export namespace Prisma {
   export type OrderGroupByOutputType = {
     id: number
     userId: string
+    orderNumber: number | null
     isIssued: boolean
     createdAt: Date
     _count: OrderCountAggregateOutputType | null
@@ -4216,6 +4227,7 @@ export namespace Prisma {
   export type OrderSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
     userId?: boolean
+    orderNumber?: boolean
     isIssued?: boolean
     createdAt?: boolean
     user?: boolean | UserDefaultArgs<ExtArgs>
@@ -4226,6 +4238,7 @@ export namespace Prisma {
   export type OrderSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
     userId?: boolean
+    orderNumber?: boolean
     isIssued?: boolean
     createdAt?: boolean
     user?: boolean | UserDefaultArgs<ExtArgs>
@@ -4234,6 +4247,7 @@ export namespace Prisma {
   export type OrderSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
     userId?: boolean
+    orderNumber?: boolean
     isIssued?: boolean
     createdAt?: boolean
     user?: boolean | UserDefaultArgs<ExtArgs>
@@ -4242,11 +4256,12 @@ export namespace Prisma {
   export type OrderSelectScalar = {
     id?: boolean
     userId?: boolean
+    orderNumber?: boolean
     isIssued?: boolean
     createdAt?: boolean
   }
 
-  export type OrderOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "userId" | "isIssued" | "createdAt", ExtArgs["result"]["order"]>
+  export type OrderOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "userId" | "orderNumber" | "isIssued" | "createdAt", ExtArgs["result"]["order"]>
   export type OrderInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     user?: boolean | UserDefaultArgs<ExtArgs>
     items?: boolean | Order$itemsArgs<ExtArgs>
@@ -4268,6 +4283,7 @@ export namespace Prisma {
     scalars: $Extensions.GetPayloadResult<{
       id: number
       userId: string
+      orderNumber: number | null
       isIssued: boolean
       createdAt: Date
     }, ExtArgs["result"]["order"]>
@@ -4697,6 +4713,7 @@ export namespace Prisma {
   interface OrderFieldRefs {
     readonly id: FieldRef<"Order", 'Int'>
     readonly userId: FieldRef<"Order", 'String'>
+    readonly orderNumber: FieldRef<"Order", 'Int'>
     readonly isIssued: FieldRef<"Order", 'Boolean'>
     readonly createdAt: FieldRef<"Order", 'DateTime'>
   }
@@ -8518,6 +8535,7 @@ export namespace Prisma {
   export const OrderScalarFieldEnum: {
     id: 'id',
     userId: 'userId',
+    orderNumber: 'orderNumber',
     isIssued: 'isIssued',
     createdAt: 'createdAt'
   };
@@ -8958,6 +8976,7 @@ export namespace Prisma {
     NOT?: OrderWhereInput | OrderWhereInput[]
     id?: IntFilter<"Order"> | number
     userId?: StringFilter<"Order"> | string
+    orderNumber?: IntNullableFilter<"Order"> | number | null
     isIssued?: BoolFilter<"Order"> | boolean
     createdAt?: DateTimeFilter<"Order"> | Date | string
     user?: XOR<UserScalarRelationFilter, UserWhereInput>
@@ -8967,6 +8986,7 @@ export namespace Prisma {
   export type OrderOrderByWithRelationInput = {
     id?: SortOrder
     userId?: SortOrder
+    orderNumber?: SortOrderInput | SortOrder
     isIssued?: SortOrder
     createdAt?: SortOrder
     user?: UserOrderByWithRelationInput
@@ -8979,6 +8999,7 @@ export namespace Prisma {
     OR?: OrderWhereInput[]
     NOT?: OrderWhereInput | OrderWhereInput[]
     userId?: StringFilter<"Order"> | string
+    orderNumber?: IntNullableFilter<"Order"> | number | null
     isIssued?: BoolFilter<"Order"> | boolean
     createdAt?: DateTimeFilter<"Order"> | Date | string
     user?: XOR<UserScalarRelationFilter, UserWhereInput>
@@ -8988,6 +9009,7 @@ export namespace Prisma {
   export type OrderOrderByWithAggregationInput = {
     id?: SortOrder
     userId?: SortOrder
+    orderNumber?: SortOrderInput | SortOrder
     isIssued?: SortOrder
     createdAt?: SortOrder
     _count?: OrderCountOrderByAggregateInput
@@ -9003,6 +9025,7 @@ export namespace Prisma {
     NOT?: OrderScalarWhereWithAggregatesInput | OrderScalarWhereWithAggregatesInput[]
     id?: IntWithAggregatesFilter<"Order"> | number
     userId?: StringWithAggregatesFilter<"Order"> | string
+    orderNumber?: IntNullableWithAggregatesFilter<"Order"> | number | null
     isIssued?: BoolWithAggregatesFilter<"Order"> | boolean
     createdAt?: DateTimeWithAggregatesFilter<"Order"> | Date | string
   }
@@ -9436,6 +9459,7 @@ export namespace Prisma {
   }
 
   export type OrderCreateInput = {
+    orderNumber?: number | null
     isIssued?: boolean
     createdAt?: Date | string
     user: UserCreateNestedOneWithoutOrdersInput
@@ -9445,12 +9469,14 @@ export namespace Prisma {
   export type OrderUncheckedCreateInput = {
     id?: number
     userId: string
+    orderNumber?: number | null
     isIssued?: boolean
     createdAt?: Date | string
     items?: UserItemUncheckedCreateNestedManyWithoutOrderInput
   }
 
   export type OrderUpdateInput = {
+    orderNumber?: NullableIntFieldUpdateOperationsInput | number | null
     isIssued?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     user?: UserUpdateOneRequiredWithoutOrdersNestedInput
@@ -9460,6 +9486,7 @@ export namespace Prisma {
   export type OrderUncheckedUpdateInput = {
     id?: IntFieldUpdateOperationsInput | number
     userId?: StringFieldUpdateOperationsInput | string
+    orderNumber?: NullableIntFieldUpdateOperationsInput | number | null
     isIssued?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     items?: UserItemUncheckedUpdateManyWithoutOrderNestedInput
@@ -9468,11 +9495,13 @@ export namespace Prisma {
   export type OrderCreateManyInput = {
     id?: number
     userId: string
+    orderNumber?: number | null
     isIssued?: boolean
     createdAt?: Date | string
   }
 
   export type OrderUpdateManyMutationInput = {
+    orderNumber?: NullableIntFieldUpdateOperationsInput | number | null
     isIssued?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -9480,6 +9509,7 @@ export namespace Prisma {
   export type OrderUncheckedUpdateManyInput = {
     id?: IntFieldUpdateOperationsInput | number
     userId?: StringFieldUpdateOperationsInput | string
+    orderNumber?: NullableIntFieldUpdateOperationsInput | number | null
     isIssued?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -10135,17 +10165,20 @@ export namespace Prisma {
   export type OrderCountOrderByAggregateInput = {
     id?: SortOrder
     userId?: SortOrder
+    orderNumber?: SortOrder
     isIssued?: SortOrder
     createdAt?: SortOrder
   }
 
   export type OrderAvgOrderByAggregateInput = {
     id?: SortOrder
+    orderNumber?: SortOrder
   }
 
   export type OrderMaxOrderByAggregateInput = {
     id?: SortOrder
     userId?: SortOrder
+    orderNumber?: SortOrder
     isIssued?: SortOrder
     createdAt?: SortOrder
   }
@@ -10153,12 +10186,14 @@ export namespace Prisma {
   export type OrderMinOrderByAggregateInput = {
     id?: SortOrder
     userId?: SortOrder
+    orderNumber?: SortOrder
     isIssued?: SortOrder
     createdAt?: SortOrder
   }
 
   export type OrderSumOrderByAggregateInput = {
     id?: SortOrder
+    orderNumber?: SortOrder
   }
 
   export type EnumTokenTypeFilter<$PrismaModel = never> = {
@@ -11067,6 +11102,7 @@ export namespace Prisma {
   }
 
   export type OrderCreateWithoutUserInput = {
+    orderNumber?: number | null
     isIssued?: boolean
     createdAt?: Date | string
     items?: UserItemCreateNestedManyWithoutOrderInput
@@ -11074,6 +11110,7 @@ export namespace Prisma {
 
   export type OrderUncheckedCreateWithoutUserInput = {
     id?: number
+    orderNumber?: number | null
     isIssued?: boolean
     createdAt?: Date | string
     items?: UserItemUncheckedCreateNestedManyWithoutOrderInput
@@ -11174,6 +11211,7 @@ export namespace Prisma {
     NOT?: OrderScalarWhereInput | OrderScalarWhereInput[]
     id?: IntFilter<"Order"> | number
     userId?: StringFilter<"Order"> | string
+    orderNumber?: IntNullableFilter<"Order"> | number | null
     isIssued?: BoolFilter<"Order"> | boolean
     createdAt?: DateTimeFilter<"Order"> | Date | string
   }
@@ -11250,6 +11288,7 @@ export namespace Prisma {
   }
 
   export type OrderCreateWithoutItemsInput = {
+    orderNumber?: number | null
     isIssued?: boolean
     createdAt?: Date | string
     user: UserCreateNestedOneWithoutOrdersInput
@@ -11258,6 +11297,7 @@ export namespace Prisma {
   export type OrderUncheckedCreateWithoutItemsInput = {
     id?: number
     userId: string
+    orderNumber?: number | null
     isIssued?: boolean
     createdAt?: Date | string
   }
@@ -11362,6 +11402,7 @@ export namespace Prisma {
   }
 
   export type OrderUpdateWithoutItemsInput = {
+    orderNumber?: NullableIntFieldUpdateOperationsInput | number | null
     isIssued?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     user?: UserUpdateOneRequiredWithoutOrdersNestedInput
@@ -11370,6 +11411,7 @@ export namespace Prisma {
   export type OrderUncheckedUpdateWithoutItemsInput = {
     id?: IntFieldUpdateOperationsInput | number
     userId?: StringFieldUpdateOperationsInput | string
+    orderNumber?: NullableIntFieldUpdateOperationsInput | number | null
     isIssued?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -11675,6 +11717,7 @@ export namespace Prisma {
 
   export type OrderCreateManyUserInput = {
     id?: number
+    orderNumber?: number | null
     isIssued?: boolean
     createdAt?: Date | string
   }
@@ -11749,6 +11792,7 @@ export namespace Prisma {
   }
 
   export type OrderUpdateWithoutUserInput = {
+    orderNumber?: NullableIntFieldUpdateOperationsInput | number | null
     isIssued?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     items?: UserItemUpdateManyWithoutOrderNestedInput
@@ -11756,6 +11800,7 @@ export namespace Prisma {
 
   export type OrderUncheckedUpdateWithoutUserInput = {
     id?: IntFieldUpdateOperationsInput | number
+    orderNumber?: NullableIntFieldUpdateOperationsInput | number | null
     isIssued?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     items?: UserItemUncheckedUpdateManyWithoutOrderNestedInput
@@ -11763,6 +11808,7 @@ export namespace Prisma {
 
   export type OrderUncheckedUpdateManyWithoutUserInput = {
     id?: IntFieldUpdateOperationsInput | number
+    orderNumber?: NullableIntFieldUpdateOperationsInput | number | null
     isIssued?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }

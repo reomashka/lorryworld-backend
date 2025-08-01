@@ -6,6 +6,7 @@ import {
 } from '@nestjs/common'
 import { ItemStatus } from '@prisma/__generated__'
 
+import { OrderService } from '@/order/order.service'
 import { PrismaService } from '@/prisma/prisma.service'
 import { TelegramService } from '@/telegram/telegram.service'
 
@@ -16,7 +17,8 @@ import { WithdrawItemsDto } from './dto/withdrawItems'
 export class ItemService {
 	public constructor(
 		private readonly prismaService: PrismaService,
-		private readonly telegramService: TelegramService
+		private readonly telegramService: TelegramService,
+		private readonly orderService: OrderService
 	) {}
 
 	public async getAllItems() {
@@ -91,6 +93,7 @@ export class ItemService {
 
 		return result
 	}
+
 	public async withdrawItem(dto: WithdrawItemsDto) {
 		const user = await this.prismaService.user.findUnique({
 			where: { id: dto.userId }
@@ -114,18 +117,14 @@ export class ItemService {
 			})
 
 			if (itemsToWithdraw.length === 0) {
-				throw new BadRequestException(
-					'No items available for withdrawal'
-				)
+				throw new BadRequestException('No items available for withdraw')
 			}
 
 			// 2. Создать заказ
-			const order = await prisma.order.create({
-				data: {
-					userId: dto.userId,
-					isIssued: false
-				}
-			})
+			const order = await this.orderService.createOrder(
+				dto.userId,
+				prisma
+			)
 
 			// 3. Обновить все userItem, добавив им orderId
 			const itemIds = itemsToWithdraw.map(item => item.id)

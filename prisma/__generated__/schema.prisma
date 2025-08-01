@@ -54,8 +54,9 @@ model UserItem {
 }
 
 model Order {
-  id     Int    @id @default(autoincrement())
-  userId String
+  id          Int    @id @default(autoincrement())
+  userId      String
+  orderNumber Int?   @map("order_number")
 
   isIssued  Boolean  @default(false) @map("is_issued")
   createdAt DateTime @default(now()) @map("created_at")
@@ -104,7 +105,7 @@ model Item {
   description String?
   icon        String
 
-  game  String?
+  game  String?    @default("MM")
   users UserItem[]
 
   @@map("items")
