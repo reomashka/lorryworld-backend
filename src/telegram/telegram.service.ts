@@ -1,19 +1,20 @@
 import {
 	BadRequestException,
 	Injectable,
-	InternalServerErrorException,
-	Logger
+	Logger,
+	NotFoundException
 } from '@nestjs/common'
 import { ConfigService } from '@nestjs/config'
-import { ItemStatus } from '@prisma/__generated__'
 
+import { OrderService } from '@/order/order.service'
 import { PrismaService } from '@/prisma/prisma.service'
 
 @Injectable()
 export class TelegramService {
 	public constructor(
 		private readonly configService: ConfigService,
-		private readonly prismaService: PrismaService
+		private readonly prismaService: PrismaService,
+		private readonly orderService: OrderService
 	) {}
 	private readonly logger = new Logger(TelegramService.name)
 
@@ -76,49 +77,125 @@ export class TelegramService {
 		}
 	}
 
-	public async handleWebhook(payload: any) {
-		this.logger.debug('Telegram update received:', JSON.stringify(payload))
-
-		const data = payload?.data
-		const parts = data.split('_')
-		const userId = parts[2]
-		const type = parts[3]
-
-		if (!userId) {
-			throw new BadRequestException('User ID is required')
-		}
-
+	public async withdrawMessage(text: string, type: string, orderId: number) {
 		try {
-			const result = await this.prismaService.userItem.updateMany({
-				where: {
-					userId,
-					status: ItemStatus.WITHDRAWN,
-					isIssued: false
-				},
-				data: {
-					isIssued: true
-				}
-			})
+			const chatId = this.chatMap[type]
 
-			if (result.count === 0) {
-				this.sendMessage(
-					`ℹ️ Все товары уже были подтверждены ранее или отсутствуют для выдачи.\nНикнейм пользователя: ${userId}`,
-					false,
-					type
-				)
+			if (!chatId) {
+				console.warn(`No chat ID configured for type: ${type}`)
 				return
 			}
 
+			console.log('Sending Telegram to chat:', chatId)
+
+			const body: any = {
+				chat_id: chatId,
+				parse_mode: 'HTML',
+				text
+			}
+
+			if (orderId && type) {
+				body.reply_markup = {
+					inline_keyboard: [
+						[
+							{
+								text: '✅ Подтвердить выдачу',
+								callback_data: `confirm_issuance_${orderId}_${type}`
+							}
+						]
+					]
+				}
+			}
+
+			await fetch(
+				`https://api.telegram.org/bot${this.configService.getOrThrow<string>('TELEGRAM_BOT_TOKEN')}/sendMessage`,
+				{
+					method: 'POST',
+					headers: {
+						'Content-Type': 'application/json'
+					},
+					body: JSON.stringify(body)
+				}
+			)
+		} catch (error) {
+			console.error(
+				'Telegram error:',
+				error.response?.data || error.message
+			)
+		}
+	}
+
+	public async handleWebhook(payload: any) {
+		const data = payload?.callback_query.data
+		if (!data) {
+			throw new BadRequestException('Invalid callback data')
+		}
+		const parts = data.split('_')
+		const orderId = Number(parts[2])
+		const type = parts[3]
+
+		if (!orderId) {
+			throw new BadRequestException('Order ID is required')
+		}
+
+		const order = await this.prismaService.order.findUnique({
+			where: { id: orderId },
+			include: {
+				user: true,
+				items: true
+			}
+		})
+
+		if (!order || !order.user) {
+			throw new NotFoundException('Order or user not found')
+		}
+
+		if (order.isIssued) {
 			await this.sendMessage(
-				`✅ Все товары успешно выданы для пользователя.\nНикнейм пользователя: ${userId}`,
+				`ℹ️ Заказ уже был закрыт ранее.\n\n` +
+					`<b>ID пользователя:</b> ${order.user.id}\n` +
+					`<b>Контакт:</b> ${order.user.contact}\n` +
+					`<b>Ник на сайте:</b> ${order.user.displayName}\n` +
+					`<b>Роблокс никнейм:</b> ${order.user.robloxUsername}\n`,
 				false,
 				type
 			)
-		} catch (error) {
-			console.error(error)
-			throw new InternalServerErrorException(
-				'Ошибка при подтверждении вывода'
-			)
+			return
 		}
+
+		this.orderService.updateIssuedStatus([{ orderId }])
+
+		// await this.prismaService.$transaction(async prisma => {
+		// 	await prisma.userItem.updateMany({
+		// 		where: {
+		// 			status: ItemStatus.WITHDRAWN,
+		// 			isIssued: false,
+		// 			orderId
+		// 		},
+		// 		data: {
+		// 			isIssued: true
+		// 		}
+		// 	})
+
+		// 	await prisma.order.update({
+		// 		where: {
+		// 			id: orderId
+		// 		},
+		// 		data: {
+		// 			isIssued: true,
+		// 			orderNumber: 0
+		// 		}
+		// 	})
+		// })
+
+		await this.sendMessage(
+			`✅ Заказ успешно закрыт, все товары выданы.\n\n` +
+				`<b>ID пользователя:</b> ${order.user.id}\n` +
+				`<b>Контакт:</b> ${order.user.contact}\n` +
+				`<b>Ник на сайте:</b> ${order.user.displayName}\n` +
+				`<b>Роблокс никнейм:</b> ${order.user.robloxUsername}\n`,
+			false,
+			type
+		)
 	}
 }

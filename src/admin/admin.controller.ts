@@ -29,4 +29,11 @@ export class AdminController {
 
 		return this.adminService.getStatsRegistrations(fromDate, toDate)
 	}
+
+	@Get('stats/items')
+	public async getStatsAllWithdrawnItems(
+		@Query('period') period: 'day' | 'week' | 'all'
+	) {
+		return this.adminService.getStatsAllPurchasedItems(period)
+	}
 }

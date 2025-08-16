@@ -139,6 +139,47 @@ export class ItemService {
 				}
 			})
 
+			const orderWithItems = await prisma.order.findUnique({
+				where: {
+					id: order.id
+				},
+				include: {
+					items: {
+						include: {
+							item: true
+						}
+					}
+				}
+			})
+
+			const itemList = orderWithItems.items
+				.map(
+					it =>
+						`🔹 <b>${it.item.name}</b>\n` +
+						`💰 Цена: ${it.item.price}₽ (${it.item.price * it.quantity}₽)\n` +
+						`🎯 Тип: ${it.item.type}\n` +
+						`📦 Количество: ${it.quantity}\n` +
+						`🏷️ Редкость: ${it.item.rarity}`
+				)
+				.join(`\n\n`)
+
+			const text =
+				`<b>📤 Вывод предметов</b>\n\n` +
+				`<b>📦 Номер заказа:</b> ${orderWithItems.orderNumber}\n` +
+				`<b>♦️ Game:</b> ${dto.game}\n` +
+				`<b>👤 Пользователь:</b> ${user.displayName}\n` +
+				`<b>🆔 ID:</b> ${user.id}\n` +
+				`<b>📱 Тип связи:</b> ${user.mediaContact}\n` +
+				`<b>📨 Контакт:</b> ${user.contact}\n\n` +
+				`<b>🌕 Никнейм:</b> <code>${user.robloxUsername}</code>\n\n` +
+				itemList
+
+			await this.telegramService.withdrawMessage(
+				text,
+				dto.game,
+				orderWithItems.id
+			)
+
 			return {
 				order,
 				items: itemsToWithdraw
@@ -231,5 +272,18 @@ export class ItemService {
 				'Ошибка при подтверждении вывода'
 			)
 		}
+	}
+
+	public async updateItemPrice(
+		id: number,
+		dto: { price?: number; sale?: number }
+	) {
+		return this.prismaService.item.update({
+			where: { id },
+			data: {
+				...(dto.price !== undefined && { price: dto.price }),
+				...(dto.sale !== undefined && { sale: dto.sale })
+			}
+		})
 	}
 }

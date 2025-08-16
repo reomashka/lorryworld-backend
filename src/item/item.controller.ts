@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Post } from '@nestjs/common'
+import { Body, Controller, Get, Param, Patch, Post } from '@nestjs/common'
 import {
 	ApiBody,
 	ApiOperation,
@@ -8,6 +8,7 @@ import {
 } from '@nestjs/swagger'
 
 import { CreateUserItemDto } from './dto/createUserItem.dto'
+import { UpdateItemPriceDto } from './dto/UpdateItemPrice.dto'
 import { WithdrawItemsDto } from './dto/withdrawItems'
 import { ItemService } from './item.service'
 
@@ -67,5 +68,17 @@ export class ItemController {
 	) {
 		const finalType = type ?? 'MM'
 		return this.itemService.confirmIssuance(userId, finalType)
+	}
+
+	@ApiOperation({ summary: 'Обновить цену и скидку товара' })
+	@ApiParam({ name: 'id', description: 'ID товара' })
+	@ApiBody({ type: UpdateItemPriceDto })
+	@ApiResponse({ status: 200, description: 'Товар успешно обновлён' })
+	@Patch(':id')
+	public async updateItemPrice(
+		@Param('id') id: string,
+		@Body() dto: UpdateItemPriceDto
+	) {
+		return this.itemService.updateItemPrice(+id, dto)
 	}
 }

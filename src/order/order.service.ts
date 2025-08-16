@@ -1,5 +1,5 @@
 import { BadRequestException, Injectable } from '@nestjs/common'
-import { Prisma } from '@prisma/__generated__'
+import { ItemStatus, Prisma } from '@prisma/__generated__'
 import { PrismaClient } from '@prisma/client'
 
 import { PrismaService } from '@/prisma/prisma.service'
@@ -26,9 +26,28 @@ export class OrderService {
 
 	public async updateIssuedStatus(updates: { orderId: number }[]) {
 		const ids = updates.map(u => u.orderId)
-		return this.prismaService.order.updateMany({
-			where: { id: { in: ids } },
-			data: { isIssued: true, orderNumber: 0 }
+
+		await this.prismaService.$transaction(async prisma => {
+			await prisma.userItem.updateMany({
+				where: {
+					status: ItemStatus.WITHDRAWN,
+					isIssued: false,
+					orderId: { in: ids }
+				},
+				data: {
+					isIssued: true
+				}
+			})
+
+			await prisma.order.updateMany({
+				where: {
+					id: { in: ids }
+				},
+				data: {
+					isIssued: true,
+					orderNumber: 0
+				}
+			})
 		})
 	}
 
@@ -60,7 +79,7 @@ export class OrderService {
 	}
 
 	public async getActiveOrders(userId: string) {
-		const orders = await this.prismaService.order.findMany({
+		return await this.prismaService.order.findMany({
 			where: {
 				userId,
 				isIssued: false
@@ -76,7 +95,5 @@ export class OrderService {
 			// 	}
 			// }
 		})
-
-		return orders
 	}
 }

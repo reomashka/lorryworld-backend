@@ -22,8 +22,8 @@ export class AdminService {
 		}
 	}
 
-	private async getAggregateSums(
-		model: 'payment' | 'userItem',
+	private async getDashboardAggregates(
+		model: 'payment' | 'userItem' | 'user',
 		where: object
 	) {
 		const { startOfToday, startOfYesterday, startOfWeek } =
@@ -33,27 +33,18 @@ export class AdminService {
 			const [today, yesterday, week] = await Promise.all([
 				this.prismaService.payment.aggregate({
 					_sum: { amount: true },
-					where: {
-						...where,
-						createdAt: { gte: startOfToday }
-					}
+					where: { ...where, createdAt: { gte: startOfToday } }
 				}),
 				this.prismaService.payment.aggregate({
 					_sum: { amount: true },
 					where: {
 						...where,
-						createdAt: {
-							gte: startOfYesterday,
-							lt: startOfToday
-						}
+						createdAt: { gte: startOfYesterday, lt: startOfToday }
 					}
 				}),
 				this.prismaService.payment.aggregate({
 					_sum: { amount: true },
-					where: {
-						...where,
-						createdAt: { gte: startOfWeek }
-					}
+					where: { ...where, createdAt: { gte: startOfWeek } }
 				})
 			])
 
@@ -62,31 +53,24 @@ export class AdminService {
 				yesterday: yesterday._sum.amount || 0,
 				week: week._sum.amount || 0
 			}
-		} else {
+		}
+
+		if (model === 'userItem') {
 			const [todayCount, yesterdayCount, weekCount] = await Promise.all([
 				this.prismaService.userItem.aggregate({
 					_count: true,
-					where: {
-						...where,
-						createdAt: { gte: startOfToday }
-					}
+					where: { ...where, createdAt: { gte: startOfToday } }
 				}),
 				this.prismaService.userItem.aggregate({
 					_count: true,
 					where: {
 						...where,
-						createdAt: {
-							gte: startOfYesterday,
-							lt: startOfToday
-						}
+						createdAt: { gte: startOfYesterday, lt: startOfToday }
 					}
 				}),
 				this.prismaService.userItem.aggregate({
 					_count: true,
-					where: {
-						...where,
-						createdAt: { gte: startOfWeek }
-					}
+					where: { ...where, createdAt: { gte: startOfWeek } }
 				})
 			])
 
@@ -96,19 +80,46 @@ export class AdminService {
 				week: weekCount._count || 0
 			}
 		}
+
+		// model === 'user'
+		const [todayCount, yesterdayCount, weekCount] = await Promise.all([
+			this.prismaService.user.aggregate({
+				_count: true,
+				where: { ...where, createdAt: { gte: startOfToday } }
+			}),
+			this.prismaService.user.aggregate({
+				_count: true,
+				where: {
+					...where,
+					createdAt: { gte: startOfYesterday, lt: startOfToday }
+				}
+			}),
+			this.prismaService.user.aggregate({
+				_count: true,
+				where: { ...where, createdAt: { gte: startOfWeek } }
+			})
+		])
+
+		return {
+			today: todayCount._count || 0,
+			yesterday: yesterdayCount._count || 0,
+			week: weekCount._count || 0
+		}
 	}
 
 	public async getDashboardStats() {
-		const earnings = await this.getAggregateSums('payment', {
+		const earnings = await this.getDashboardAggregates('payment', {
 			status: PaymentStatus.SUCCESS
 		})
 
-		const items = await this.getAggregateSums('userItem', {
+		const items = await this.getDashboardAggregates('userItem', {
 			status: ItemStatus.WITHDRAWN,
 			isIssued: true
 		})
 
-		return { earnings, items }
+		const registrations = await this.getDashboardAggregates('user', {})
+
+		return { earnings, items, registrations }
 	}
 
 	public async getStatsRegistrations(from: Date, to: Date) {
@@ -130,5 +141,53 @@ export class AdminService {
 				createdAt: 'asc'
 			}
 		})
+	}
+
+	public async getStatsAllPurchasedItems(period: 'day' | 'week' | 'all') {
+		let dateFrom: Date | undefined
+
+		if (period === 'day') {
+			const now = new Date()
+			dateFrom = new Date(
+				now.getFullYear(),
+				now.getMonth(),
+				now.getDate() - 1
+			)
+		} else if (period === 'week') {
+			const now = new Date()
+			dateFrom = new Date(
+				now.getFullYear(),
+				now.getMonth(),
+				now.getDate() - 7
+			)
+		}
+
+		const stats = await this.prismaService.userItem.groupBy({
+			by: ['itemId'],
+			_sum: {
+				quantity: true
+			},
+			where: dateFrom
+				? {
+						createdAt: {
+							gte: dateFrom
+						}
+					}
+				: undefined
+		})
+		return await Promise.all(
+			stats.map(async stat => {
+				const item = await this.prismaService.item.findUnique({
+					where: { id: stat.itemId }
+				})
+
+				return {
+					itemId: stat.itemId,
+					itemName: item?.name,
+					totalQuantity: stat._sum.quantity,
+					game: item?.game
+				}
+			})
+		)
 	}
 }
