@@ -156,7 +156,11 @@ export class ItemService {
 				.map(
 					it =>
 						`🔹 <b>${it.item.name}</b>\n` +
-						`💰 Цена: ${it.item.price}₽ (${it.item.price * it.quantity}₽)\n` +
+						`💰 Цена: ${it.item.price}₽` +
+						(it.quantity > 1
+							? ` (${it.item.price * it.quantity}₽)`
+							: '') +
+						`\n` +
 						`🎯 Тип: ${it.item.type}\n` +
 						`📦 Количество: ${it.quantity}\n` +
 						`🏷️ Редкость: ${it.item.rarity}`
@@ -165,8 +169,8 @@ export class ItemService {
 
 			const text =
 				`<b>📤 Вывод предметов</b>\n\n` +
-				`<b>📦 Номер заказа:</b> ${orderWithItems.orderNumber}\n` +
-				`<b>♦️ Game:</b> ${dto.game}\n` +
+				`<b>📦 Номер заказа:</b> ${String(orderWithItems.orderNumber).padStart(3, '0')}\n` +
+				`<b>♦️ Игра:</b> ${dto.game}\n` +
 				`<b>👤 Пользователь:</b> ${user.displayName}\n` +
 				`<b>🆔 ID:</b> ${user.id}\n` +
 				`<b>📱 Тип связи:</b> ${user.mediaContact}\n` +
