@@ -6,6 +6,7 @@ import {
 } from '@nestjs/common'
 import { ItemStatus } from '@prisma/__generated__'
 
+import { LoggerService } from '@/logger/logger.service'
 import { OrderService } from '@/order/order.service'
 import { PrismaService } from '@/prisma/prisma.service'
 import { TelegramService } from '@/telegram/telegram.service'
@@ -18,7 +19,8 @@ export class ItemService {
 	public constructor(
 		private readonly prismaService: PrismaService,
 		private readonly telegramService: TelegramService,
-		private readonly orderService: OrderService
+		private readonly orderService: OrderService,
+		private readonly logger: LoggerService
 	) {}
 
 	public async getAllItems() {
@@ -90,7 +92,7 @@ export class ItemService {
 			false,
 			item.game
 		)
-
+		this.logger.log(`Покупка пользователем [User ID: ${dto.userId}]`)
 		return result
 	}
 

@@ -1,11 +1,11 @@
 import {
 	BadRequestException,
 	Injectable,
-	Logger,
 	NotFoundException
 } from '@nestjs/common'
 import { ConfigService } from '@nestjs/config'
 
+import { LoggerService } from '@/logger/logger.service'
 import { OrderService } from '@/order/order.service'
 import { PrismaService } from '@/prisma/prisma.service'
 
@@ -14,9 +14,9 @@ export class TelegramService {
 	public constructor(
 		private readonly configService: ConfigService,
 		private readonly prismaService: PrismaService,
+		private readonly logger: LoggerService,
 		private readonly orderService: OrderService
 	) {}
-	private readonly logger = new Logger(TelegramService.name)
 
 	private chatMap: Record<string, string> = {
 		MM: this.configService.getOrThrow<string>('TG_CHAT_ID_MM'),
@@ -34,11 +34,11 @@ export class TelegramService {
 			const chatId = this.chatMap[type]
 
 			if (!chatId) {
-				console.warn(`No chat ID configured for type: ${type}`)
+				this.logger.error(`No chat ID configured for type: ${type}`)
 				return
 			}
 
-			console.log('Sending Telegram to chat:', chatId)
+			this.logger.log(`Отправка сообщения в чат: ${chatId}`)
 
 			const body: any = {
 				chat_id: chatId,
@@ -70,9 +70,8 @@ export class TelegramService {
 				}
 			)
 		} catch (error) {
-			console.error(
-				'Telegram error:',
-				error.response?.data || error.message
+			this.logger.error(
+				`Telegram error: ${error.response?.data || error.message}`
 			)
 		}
 	}
@@ -86,7 +85,7 @@ export class TelegramService {
 				return
 			}
 
-			console.log('Sending Telegram to chat:', chatId)
+			this.logger.log(`Отправка сообщения в чат: ${chatId}`)
 
 			const body: any = {
 				chat_id: chatId,
@@ -118,9 +117,8 @@ export class TelegramService {
 				}
 			)
 		} catch (error) {
-			console.error(
-				'Telegram error:',
-				error.response?.data || error.message
+			this.logger.error(
+				`Telegram error: ${error.response?.data || error.message}`
 			)
 		}
 	}
@@ -164,29 +162,6 @@ export class TelegramService {
 		}
 
 		this.orderService.updateIssuedStatus([{ orderId }])
-
-		// await this.prismaService.$transaction(async prisma => {
-		// 	await prisma.userItem.updateMany({
-		// 		where: {
-		// 			status: ItemStatus.WITHDRAWN,
-		// 			isIssued: false,
-		// 			orderId
-		// 		},
-		// 		data: {
-		// 			isIssued: true
-		// 		}
-		// 	})
-
-		// 	await prisma.order.update({
-		// 		where: {
-		// 			id: orderId
-		// 		},
-		// 		data: {
-		// 			isIssued: true,
-		// 			orderNumber: 0
-		// 		}
-		// 	})
-		// })
 
 		await this.sendMessage(
 			`✅ Заказ успешно закрыт, все товары выданы.\n\n` +

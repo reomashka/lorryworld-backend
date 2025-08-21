@@ -10,6 +10,7 @@ import { AuthMethod, User } from '@prisma/__generated__'
 import { verify } from 'argon2'
 import { Request, Response } from 'express'
 
+import { LoggerService } from '@/logger/logger.service'
 import { UserService } from '@/user/user.service'
 
 import { LoginDto } from './dto/login.dto'
@@ -21,6 +22,7 @@ export class AuthService {
 	public constructor(
 		private readonly userService: UserService,
 		private readonly configService: ConfigService,
+		private readonly logger: LoggerService,
 		private readonly emailConfirmationService: EmailConfirmationService
 	) {}
 
@@ -46,6 +48,15 @@ export class AuthService {
 			'',
 			AuthMethod.CREDENTIALS,
 			false
+		)
+
+		const ip =
+			(req.headers['x-forwarded-for'] as string) ||
+			req.socket.remoteAddress?.replace('::ffff:', '') ||
+			req.ip?.replace('::ffff:', '')
+
+		this.logger.log(
+			`[IP: ${ip}] Пользователь ${newUser.displayName} был зарегистрирован`
 		)
 
 		// this.emailConfirmationService.sendVerificationToken(newUser)

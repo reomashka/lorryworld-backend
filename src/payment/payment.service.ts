@@ -1,14 +1,13 @@
 import { BadRequestException, Injectable } from '@nestjs/common'
-import { Logger } from '@nestjs/common'
 import { ConfigService } from '@nestjs/config'
 import { PaymentStatus, PaymentType } from '@prisma/__generated__'
 import { createHmac } from 'crypto'
 import { v4 as uuidv4 } from 'uuid'
 
+import { LoggerService } from '@/logger/logger.service'
 import { PrismaService } from '@/prisma/prisma.service'
 import { TelegramService } from '@/telegram/telegram.service'
 
-// ✅
 import { PaymentDto } from './dto/payment.dto'
 import { PaymentWebhookDto } from './dto/paymentWebhook.dto'
 
@@ -17,9 +16,9 @@ export class PaymentService {
 	public constructor(
 		private readonly configService: ConfigService,
 		private readonly prismaService: PrismaService,
-		private readonly telegramService: TelegramService
+		private readonly telegramService: TelegramService,
+		private readonly logger: LoggerService
 	) {}
-	private readonly logger = new Logger(PaymentService.name)
 
 	private async generateSignature(payload: string) {
 		const secret = this.configService.getOrThrow<string>('LAVA_SECRET_KEY')
@@ -110,7 +109,6 @@ export class PaymentService {
 		}).toString()
 
 		const urlWithParams = `${PAYMENT_URL}?${queryParams}`
-		this.logger.log(urlWithParams)
 
 		try {
 			const response = await fetch(urlWithParams, {
@@ -178,8 +176,6 @@ export class PaymentService {
 	// webhook
 	public async handleWebhook(payload: PaymentWebhookDto) {
 		let statusPayment: PaymentStatus
-		this.logger.verbose(JSON.stringify(payload))
-		console.log(payload)
 
 		switch (payload.status) {
 			case 'success':
@@ -218,7 +214,7 @@ export class PaymentService {
 
 			if (!payment) {
 				this.logger.error(
-					`❌ Payment not found in tx: ${payload.invoice_id}`
+					`❌ Платеж не найден c invoiceId: ${payload.invoice_id} не найден`
 				)
 				throw new Error(
 					`Payment with invoiceId ${payload.invoice_id} not found`
@@ -230,7 +226,9 @@ export class PaymentService {
 				where: { invoiceId: payload.invoice_id },
 				data: { status: statusPayment }
 			})
-			this.logger.log(`✅ Payment status updated to ${statusPayment}`)
+			this.logger.log(
+				`Статус платежа (IvoiceID - ${payload.invoice_id}) - ${statusPayment}`
+			)
 
 			// 💰 Если платеж успешен — пополняем баланс
 			if (statusPayment === PaymentStatus.SUCCESS) {
@@ -241,7 +239,7 @@ export class PaymentService {
 
 				const amountNumber = Math.ceil(parseFloat(payload.amount))
 				this.logger.log(
-					`🔢 Current balance: ${user?.balance}, adding: ${amountNumber}`
+					`Текущий баланс пользователя: ${user?.balance}, Добавлено: ${amountNumber}`
 				)
 
 				await tx.user.update({

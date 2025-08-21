@@ -1,5 +1,7 @@
 import { forwardRef, Module } from '@nestjs/common'
 
+import { LoggerService } from '@/logger/logger.service'
+
 import { UserModule } from '../user/user.module'
 
 import { AuthController } from './auth.controller'
@@ -9,7 +11,7 @@ import { EmailConfirmationModule } from './email-confirmation/email-confirmation
 @Module({
 	imports: [UserModule, forwardRef(() => EmailConfirmationModule)],
 	controllers: [AuthController],
-	providers: [AuthService],
+	providers: [AuthService, LoggerService],
 	exports: [AuthService]
 })
 export class AuthModule {}
