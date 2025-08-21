@@ -86,14 +86,14 @@ export class OrderService {
 			},
 			orderBy: {
 				createdAt: 'asc'
+			},
+			include: {
+				items: {
+					include: {
+						item: true
+					}
+				}
 			}
-			// include: {
-			// 	items: {
-			// 		include: {
-			// 			item: true
-			// 		}
-			// 	}
-			// }
 		})
 	}
 }

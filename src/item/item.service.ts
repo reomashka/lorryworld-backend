@@ -290,4 +290,21 @@ export class ItemService {
 			}
 		})
 	}
+
+	public async getActiveGamesByUser(userId: string) {
+		const items = await this.prismaService.userItem.findMany({
+			where: {
+				userId,
+				status: 'PURCHASED'
+			},
+			include: {
+				item: true
+			}
+		})
+
+		// Получаем уникальные игры
+		const games = Array.from(new Set(items.map(i => i.item.game)))
+
+		return { games }
+	}
 }

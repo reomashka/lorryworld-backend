@@ -1,4 +1,12 @@
-import { Body, Controller, Get, Param, Patch, Post } from '@nestjs/common'
+import {
+	Body,
+	Controller,
+	Get,
+	Param,
+	Patch,
+	Post,
+	Query
+} from '@nestjs/common'
 import {
 	ApiBody,
 	ApiOperation,
@@ -80,5 +88,10 @@ export class ItemController {
 		@Body() dto: UpdateItemPriceDto
 	) {
 		return this.itemService.updateItemPrice(+id, dto)
+	}
+
+	@Get('active-games')
+	async getActiveGames(@Query('userId') userId: string) {
+		return this.itemService.getActiveGamesByUser(userId)
 	}
 }
