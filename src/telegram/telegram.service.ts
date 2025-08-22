@@ -124,10 +124,18 @@ export class TelegramService {
 	}
 
 	public async handleWebhook(payload: any) {
-		const data = payload?.callback_query.data
+		this.logger.log(`Webhook payload:, ${JSON.stringify(payload, null, 2)}`)
+
+		const data = payload?.callback_query?.data
+
 		if (!data) {
+			this.logger.error('Invalid payload: no callback_query.data')
+			this.logger.error(
+				`Payload received: ${JSON.stringify(payload, null, 2)}`
+			)
 			throw new BadRequestException('Invalid callback data')
 		}
+
 		const parts = data.split('_')
 		const orderId = Number(parts[2])
 		const type = parts[3]
