@@ -59,14 +59,14 @@ export class PaymentService {
 			const result = await response.json()
 
 			if (!response.ok) {
-				console.error('API Error Response:', result)
+				this.logger.error(`API Error Response: ${result}`)
 				throw new BadRequestException(
 					`HTTP error! status: ${response.status}`
 				)
 			}
 
 			if (!result.data || !result.data.id) {
-				console.error('Lava API returned no data:', result)
+				this.logger.error(`Lava API returned no data: ${result}`)
 				throw new BadRequestException(
 					'Lava API error: ' + JSON.stringify(result?.error || result)
 				)
@@ -91,7 +91,7 @@ export class PaymentService {
 				paymentInfo: payment
 			}
 		} catch (err) {
-			console.error(err)
+			this.logger.error(err)
 			throw err
 		}
 	}
@@ -123,7 +123,8 @@ export class PaymentService {
 			const result = await response.json()
 
 			if (!response.ok) {
-				console.error('API Error Response:', result)
+				this.logger.error(`API Error Response: ${result}`)
+
 				throw new BadRequestException(
 					`HTTP error! status: ${response.status}`
 				)
@@ -137,7 +138,7 @@ export class PaymentService {
 
 			return { ...result }
 		} catch (err) {
-			console.error(err)
+			this.logger.error(err)
 			throw err
 		}
 	}

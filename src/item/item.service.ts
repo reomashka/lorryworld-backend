@@ -272,8 +272,7 @@ export class ItemService {
 
 			return '<h2>✅ Вывод подтверждён!</h2>'
 		} catch (error) {
-			console.error(error)
-
+			this.logger.error(error)
 			throw new InternalServerErrorException(
 				'Ошибка при подтверждении вывода'
 			)

@@ -15,12 +15,21 @@ export class LoggerService implements NestLoggerService {
 			fs.mkdirSync(logDir)
 		}
 
-		const transport = new transports.DailyRotateFile({
+		const generalTransport = new transports.DailyRotateFile({
 			filename: path.join(logDir, 'logs-%DATE%.log'),
 			datePattern: 'YYYY-MM-DD',
 			zippedArchive: false,
 			maxSize: '20m',
 			maxFiles: '7d'
+		})
+
+		const errorTransport = new transports.DailyRotateFile({
+			filename: path.join(logDir, 'errors-%DATE%.log'),
+			datePattern: 'YYYY-MM-DD',
+			zippedArchive: false,
+			maxSize: '50m',
+			maxFiles: '7d',
+			level: 'error'
 		})
 
 		this.logger = createLogger({
@@ -32,7 +41,11 @@ export class LoggerService implements NestLoggerService {
 						`[${timestamp}] [${level.toUpperCase()}] ${message}`
 				)
 			),
-			transports: [transport, new transports.Console()]
+			transports: [
+				generalTransport,
+				errorTransport,
+				new transports.Console()
+			]
 		})
 	}
 
