@@ -92,7 +92,9 @@ export class ItemService {
 			false,
 			item.game
 		)
-		this.logger.log(`Покупка пользователем [User ID: ${dto.userId}]`)
+		this.logger.log(
+			`Покупка пользователем ${item.name} (${dto.quantity} шт.)[User ID: ${dto.userId}]`
+		)
 		return result
 	}
 
@@ -105,94 +107,99 @@ export class ItemService {
 			throw new NotFoundException('User not found')
 		}
 
-		const result = await this.prismaService.$transaction(async prisma => {
-			// 1. Найти все купленные предметы без привязки к заказу
-			const itemsToWithdraw = await prisma.userItem.findMany({
-				where: {
-					userId: dto.userId,
-					status: ItemStatus.PURCHASED,
-					orderId: null,
-					item: {
-						game: dto.game
-					}
-				}
-			})
-
-			if (itemsToWithdraw.length === 0) {
-				throw new BadRequestException('No items available for withdraw')
-			}
-
-			// 2. Создать заказ
-			const order = await this.orderService.createOrder(
-				dto.userId,
-				prisma
-			)
-
-			// 3. Обновить все userItem, добавив им orderId
-			const itemIds = itemsToWithdraw.map(item => item.id)
-
-			await prisma.userItem.updateMany({
-				where: {
-					id: { in: itemIds }
-				},
-				data: {
-					status: ItemStatus.WITHDRAWN,
-					orderId: order.id
-				}
-			})
-
-			const orderWithItems = await prisma.order.findUnique({
-				where: {
-					id: order.id
-				},
-				include: {
-					items: {
-						include: {
-							item: true
+		try {
+			const result = await this.prismaService.$transaction(
+				async prisma => {
+					// 1. Найти все купленные предметы без привязки к заказу
+					const itemsToWithdraw = await prisma.userItem.findMany({
+						where: {
+							userId: dto.userId,
+							status: ItemStatus.PURCHASED,
+							orderId: null,
+							item: { game: dto.game }
 						}
+					})
+
+					if (itemsToWithdraw.length === 0) {
+						throw new BadRequestException(
+							'No items available for withdraw'
+						)
 					}
+
+					// 2. Создать заказ
+					const order = await this.orderService.createOrder(
+						dto.userId,
+						prisma
+					)
+
+					// 3. Обновить все userItem, добавив им orderId
+					const itemIds = itemsToWithdraw.map(item => item.id)
+					await prisma.userItem.updateMany({
+						where: { id: { in: itemIds } },
+						data: {
+							status: ItemStatus.WITHDRAWN,
+							orderId: order.id
+						}
+					})
+
+					// 4. Получить заказ с предметами
+					const orderWithItems = await prisma.order.findUnique({
+						where: { id: order.id },
+						include: { items: { include: { item: true } } }
+					})
+
+					const itemList = orderWithItems.items
+						.map(
+							it =>
+								`🔹 <b>${it.item.name}</b>\n` +
+								`💰 Цена: ${it.item.price}₽` +
+								(it.quantity > 1
+									? ` (${it.item.price * it.quantity}₽)`
+									: '') +
+								`\n🎯 Тип: ${it.item.type}\n📦 Количество: ${it.quantity}\n🏷️ Редкость: ${it.item.rarity}`
+						)
+						.join('\n\n')
+
+					const text =
+						`<b>📤 Вывод предметов</b>\n\n` +
+						`<b>📦 Номер заказа:</b> ${String(orderWithItems.orderNumber).padStart(3, '0')}\n` +
+						`<b>♦️ Игра:</b> ${dto.game}\n` +
+						`<b>👤 Пользователь:</b> ${user.displayName}\n` +
+						`<b>🆔 ID:</b> ${user.id}\n` +
+						`<b>📱 Тип связи:</b> ${user.mediaContact}\n` +
+						`<b>📨 Контакт:</b> ${user.contact}\n\n` +
+						`<b>🌕 Никнейм:</b> <code>${user.robloxUsername}</code>\n\n` +
+						itemList
+
+					await this.telegramService.withdrawMessage(
+						text,
+						dto.game,
+						orderWithItems.id
+					)
+
+					this.logger.log(
+						`Вывод предметов (${dto.game}). [UserID: ${user.id}]`
+					)
+
+					return { order, items: itemsToWithdraw }
 				}
-			})
-
-			const itemList = orderWithItems.items
-				.map(
-					it =>
-						`🔹 <b>${it.item.name}</b>\n` +
-						`💰 Цена: ${it.item.price}₽` +
-						(it.quantity > 1
-							? ` (${it.item.price * it.quantity}₽)`
-							: '') +
-						`\n` +
-						`🎯 Тип: ${it.item.type}\n` +
-						`📦 Количество: ${it.quantity}\n` +
-						`🏷️ Редкость: ${it.item.rarity}`
-				)
-				.join(`\n\n`)
-
-			const text =
-				`<b>📤 Вывод предметов</b>\n\n` +
-				`<b>📦 Номер заказа:</b> ${String(orderWithItems.orderNumber).padStart(3, '0')}\n` +
-				`<b>♦️ Игра:</b> ${dto.game}\n` +
-				`<b>👤 Пользователь:</b> ${user.displayName}\n` +
-				`<b>🆔 ID:</b> ${user.id}\n` +
-				`<b>📱 Тип связи:</b> ${user.mediaContact}\n` +
-				`<b>📨 Контакт:</b> ${user.contact}\n\n` +
-				`<b>🌕 Никнейм:</b> <code>${user.robloxUsername}</code>\n\n` +
-				itemList
-
-			await this.telegramService.withdrawMessage(
-				text,
-				dto.game,
-				orderWithItems.id
 			)
 
-			return {
-				order,
-				items: itemsToWithdraw
-			}
-		})
+			return result
+		} catch (error) {
+			this.logger.error(
+				`Ошибка при выводе предметов (${dto.game}) для UserID ${dto.userId}. Stack: ${error.stack || error}`
+			)
 
-		return result
+			if (error instanceof BadRequestException) {
+				throw error
+			}
+			if (error instanceof NotFoundException) {
+				throw error
+			}
+
+			throw new InternalServerErrorException('Failed to withdraw items')
+		}
 	}
 
 	public async getAllRecentWithdrawnItems(userId: string) {

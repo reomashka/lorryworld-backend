@@ -69,7 +69,13 @@ async function bootstrap() {
 		})
 	)
 	app.setGlobalPrefix('api')
-	app.use('/uploads', express.static(join(__dirname, '..', 'uploads')))
+	app.use(
+		'/uploads',
+		express.static(join(__dirname, '..', 'uploads'), {
+			maxAge: '1y',
+			immutable: true
+		})
+	)
 
 	await app.listen(config.getOrThrow<number>('APPLICATION_PORT'))
 }
