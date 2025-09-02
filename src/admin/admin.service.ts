@@ -162,32 +162,29 @@ export class AdminService {
 			)
 		}
 
+		// Группируем по itemId и суммируем количество
 		const stats = await this.prismaService.userItem.groupBy({
 			by: ['itemId'],
-			_sum: {
-				quantity: true
-			},
-			where: dateFrom
-				? {
-						createdAt: {
-							gte: dateFrom
-						}
-					}
-				: undefined
+			_sum: { quantity: true },
+			where: dateFrom ? { createdAt: { gte: dateFrom } } : undefined
 		})
-		return await Promise.all(
-			stats.map(async stat => {
-				const item = await this.prismaService.item.findUnique({
-					where: { id: stat.itemId }
-				})
 
-				return {
-					itemId: stat.itemId,
-					itemName: item?.name,
-					totalQuantity: stat._sum.quantity,
-					game: item?.game
-				}
-			})
-		)
+		// Берём все itemId, чтобы подтянуть данные об айтемах за один запрос
+		const itemIds = stats.map(s => s.itemId)
+
+		const items = await this.prismaService.item.findMany({
+			where: { id: { in: itemIds } }
+		})
+
+		// Формируем итоговый результат
+		return stats.map(stat => {
+			const item = items.find(i => i.id === stat.itemId)
+			return {
+				itemId: stat.itemId,
+				itemName: item?.name || 'Unknown',
+				totalQuantity: stat._sum.quantity,
+				game: item?.game || 'Unknown'
+			}
+		})
 	}
 }

@@ -13,6 +13,9 @@ export class OrderService {
 			where: {
 				isIssued: false
 			},
+			orderBy: {
+				createdAt: 'desc'
+			},
 			include: {
 				user: true,
 				items: {
