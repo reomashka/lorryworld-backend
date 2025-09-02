@@ -183,7 +183,11 @@ export class AdminService {
 				itemId: stat.itemId,
 				itemName: item?.name || 'Unknown',
 				totalQuantity: stat._sum.quantity,
-				totalEarning: item.sale !== 0 ? item.sale : item.price,
+				totalEarning: item
+					? item.sale !== 0
+						? item.sale
+						: item.price
+					: 0,
 				game: item?.game || 'Unknown'
 			}
 		})
