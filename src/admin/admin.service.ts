@@ -185,8 +185,8 @@ export class AdminService {
 				totalQuantity: stat._sum.quantity,
 				totalEarning: item
 					? item.sale !== 0
-						? item.sale
-						: item.price
+						? item.sale * stat._sum.quantity
+						: item.price * stat._sum.quantity
 					: 0,
 				game: item?.game || 'Unknown'
 			}
