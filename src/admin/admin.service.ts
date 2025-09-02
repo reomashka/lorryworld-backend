@@ -179,15 +179,17 @@ export class AdminService {
 		// Формируем итоговый результат
 		return stats.map(stat => {
 			const item = items.find(i => i.id === stat.itemId)
+			const quantity = stat._sum.quantity ?? 0
+			const price = item?.price ?? 0
+			const sale = item?.sale ?? 0
+
+			const totalEarning = quantity * (sale !== 0 ? sale : price)
+
 			return {
 				itemId: stat.itemId,
 				itemName: item?.name || 'Unknown',
 				totalQuantity: stat._sum.quantity,
-				totalEarning: item
-					? item.sale !== 0
-						? item.sale * stat._sum.quantity
-						: item.price * stat._sum.quantity
-					: 0,
+				totalEarning,
 				game: item?.game || 'Unknown'
 			}
 		})
