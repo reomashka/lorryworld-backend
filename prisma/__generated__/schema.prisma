@@ -101,6 +101,7 @@ model Item {
   availability Boolean @default(true)
   type         String?
   rarity       String?
+  property     String?
 
   description String?
   icon        String

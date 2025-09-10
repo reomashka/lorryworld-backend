@@ -7338,6 +7338,7 @@ export namespace Prisma {
     availability: boolean | null
     type: string | null
     rarity: string | null
+    property: string | null
     description: string | null
     icon: string | null
     game: string | null
@@ -7351,6 +7352,7 @@ export namespace Prisma {
     availability: boolean | null
     type: string | null
     rarity: string | null
+    property: string | null
     description: string | null
     icon: string | null
     game: string | null
@@ -7364,6 +7366,7 @@ export namespace Prisma {
     availability: number
     type: number
     rarity: number
+    property: number
     description: number
     icon: number
     game: number
@@ -7391,6 +7394,7 @@ export namespace Prisma {
     availability?: true
     type?: true
     rarity?: true
+    property?: true
     description?: true
     icon?: true
     game?: true
@@ -7404,6 +7408,7 @@ export namespace Prisma {
     availability?: true
     type?: true
     rarity?: true
+    property?: true
     description?: true
     icon?: true
     game?: true
@@ -7417,6 +7422,7 @@ export namespace Prisma {
     availability?: true
     type?: true
     rarity?: true
+    property?: true
     description?: true
     icon?: true
     game?: true
@@ -7517,6 +7523,7 @@ export namespace Prisma {
     availability: boolean
     type: string | null
     rarity: string | null
+    property: string | null
     description: string | null
     icon: string
     game: string | null
@@ -7549,6 +7556,7 @@ export namespace Prisma {
     availability?: boolean
     type?: boolean
     rarity?: boolean
+    property?: boolean
     description?: boolean
     icon?: boolean
     game?: boolean
@@ -7564,6 +7572,7 @@ export namespace Prisma {
     availability?: boolean
     type?: boolean
     rarity?: boolean
+    property?: boolean
     description?: boolean
     icon?: boolean
     game?: boolean
@@ -7577,6 +7586,7 @@ export namespace Prisma {
     availability?: boolean
     type?: boolean
     rarity?: boolean
+    property?: boolean
     description?: boolean
     icon?: boolean
     game?: boolean
@@ -7590,12 +7600,13 @@ export namespace Prisma {
     availability?: boolean
     type?: boolean
     rarity?: boolean
+    property?: boolean
     description?: boolean
     icon?: boolean
     game?: boolean
   }
 
-  export type ItemOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "name" | "price" | "sale" | "availability" | "type" | "rarity" | "description" | "icon" | "game", ExtArgs["result"]["item"]>
+  export type ItemOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "name" | "price" | "sale" | "availability" | "type" | "rarity" | "property" | "description" | "icon" | "game", ExtArgs["result"]["item"]>
   export type ItemInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     users?: boolean | Item$usersArgs<ExtArgs>
     _count?: boolean | ItemCountOutputTypeDefaultArgs<ExtArgs>
@@ -7616,6 +7627,7 @@ export namespace Prisma {
       availability: boolean
       type: string | null
       rarity: string | null
+      property: string | null
       description: string | null
       icon: string
       game: string | null
@@ -8050,6 +8062,7 @@ export namespace Prisma {
     readonly availability: FieldRef<"Item", 'Boolean'>
     readonly type: FieldRef<"Item", 'String'>
     readonly rarity: FieldRef<"Item", 'String'>
+    readonly property: FieldRef<"Item", 'String'>
     readonly description: FieldRef<"Item", 'String'>
     readonly icon: FieldRef<"Item", 'String'>
     readonly game: FieldRef<"Item", 'String'>
@@ -8578,6 +8591,7 @@ export namespace Prisma {
     availability: 'availability',
     type: 'type',
     rarity: 'rarity',
+    property: 'property',
     description: 'description',
     icon: 'icon',
     game: 'game'
@@ -9175,6 +9189,7 @@ export namespace Prisma {
     availability?: BoolFilter<"Item"> | boolean
     type?: StringNullableFilter<"Item"> | string | null
     rarity?: StringNullableFilter<"Item"> | string | null
+    property?: StringNullableFilter<"Item"> | string | null
     description?: StringNullableFilter<"Item"> | string | null
     icon?: StringFilter<"Item"> | string
     game?: StringNullableFilter<"Item"> | string | null
@@ -9189,6 +9204,7 @@ export namespace Prisma {
     availability?: SortOrder
     type?: SortOrderInput | SortOrder
     rarity?: SortOrderInput | SortOrder
+    property?: SortOrderInput | SortOrder
     description?: SortOrderInput | SortOrder
     icon?: SortOrder
     game?: SortOrderInput | SortOrder
@@ -9206,6 +9222,7 @@ export namespace Prisma {
     availability?: BoolFilter<"Item"> | boolean
     type?: StringNullableFilter<"Item"> | string | null
     rarity?: StringNullableFilter<"Item"> | string | null
+    property?: StringNullableFilter<"Item"> | string | null
     description?: StringNullableFilter<"Item"> | string | null
     icon?: StringFilter<"Item"> | string
     game?: StringNullableFilter<"Item"> | string | null
@@ -9220,6 +9237,7 @@ export namespace Prisma {
     availability?: SortOrder
     type?: SortOrderInput | SortOrder
     rarity?: SortOrderInput | SortOrder
+    property?: SortOrderInput | SortOrder
     description?: SortOrderInput | SortOrder
     icon?: SortOrder
     game?: SortOrderInput | SortOrder
@@ -9241,6 +9259,7 @@ export namespace Prisma {
     availability?: BoolWithAggregatesFilter<"Item"> | boolean
     type?: StringNullableWithAggregatesFilter<"Item"> | string | null
     rarity?: StringNullableWithAggregatesFilter<"Item"> | string | null
+    property?: StringNullableWithAggregatesFilter<"Item"> | string | null
     description?: StringNullableWithAggregatesFilter<"Item"> | string | null
     icon?: StringWithAggregatesFilter<"Item"> | string
     game?: StringNullableWithAggregatesFilter<"Item"> | string | null
@@ -9667,6 +9686,7 @@ export namespace Prisma {
     availability?: boolean
     type?: string | null
     rarity?: string | null
+    property?: string | null
     description?: string | null
     icon: string
     game?: string | null
@@ -9681,6 +9701,7 @@ export namespace Prisma {
     availability?: boolean
     type?: string | null
     rarity?: string | null
+    property?: string | null
     description?: string | null
     icon: string
     game?: string | null
@@ -9694,6 +9715,7 @@ export namespace Prisma {
     availability?: BoolFieldUpdateOperationsInput | boolean
     type?: NullableStringFieldUpdateOperationsInput | string | null
     rarity?: NullableStringFieldUpdateOperationsInput | string | null
+    property?: NullableStringFieldUpdateOperationsInput | string | null
     description?: NullableStringFieldUpdateOperationsInput | string | null
     icon?: StringFieldUpdateOperationsInput | string
     game?: NullableStringFieldUpdateOperationsInput | string | null
@@ -9708,6 +9730,7 @@ export namespace Prisma {
     availability?: BoolFieldUpdateOperationsInput | boolean
     type?: NullableStringFieldUpdateOperationsInput | string | null
     rarity?: NullableStringFieldUpdateOperationsInput | string | null
+    property?: NullableStringFieldUpdateOperationsInput | string | null
     description?: NullableStringFieldUpdateOperationsInput | string | null
     icon?: StringFieldUpdateOperationsInput | string
     game?: NullableStringFieldUpdateOperationsInput | string | null
@@ -9722,6 +9745,7 @@ export namespace Prisma {
     availability?: boolean
     type?: string | null
     rarity?: string | null
+    property?: string | null
     description?: string | null
     icon: string
     game?: string | null
@@ -9734,6 +9758,7 @@ export namespace Prisma {
     availability?: BoolFieldUpdateOperationsInput | boolean
     type?: NullableStringFieldUpdateOperationsInput | string | null
     rarity?: NullableStringFieldUpdateOperationsInput | string | null
+    property?: NullableStringFieldUpdateOperationsInput | string | null
     description?: NullableStringFieldUpdateOperationsInput | string | null
     icon?: StringFieldUpdateOperationsInput | string
     game?: NullableStringFieldUpdateOperationsInput | string | null
@@ -9747,6 +9772,7 @@ export namespace Prisma {
     availability?: BoolFieldUpdateOperationsInput | boolean
     type?: NullableStringFieldUpdateOperationsInput | string | null
     rarity?: NullableStringFieldUpdateOperationsInput | string | null
+    property?: NullableStringFieldUpdateOperationsInput | string | null
     description?: NullableStringFieldUpdateOperationsInput | string | null
     icon?: StringFieldUpdateOperationsInput | string
     game?: NullableStringFieldUpdateOperationsInput | string | null
@@ -10326,6 +10352,7 @@ export namespace Prisma {
     availability?: SortOrder
     type?: SortOrder
     rarity?: SortOrder
+    property?: SortOrder
     description?: SortOrder
     icon?: SortOrder
     game?: SortOrder
@@ -10345,6 +10372,7 @@ export namespace Prisma {
     availability?: SortOrder
     type?: SortOrder
     rarity?: SortOrder
+    property?: SortOrder
     description?: SortOrder
     icon?: SortOrder
     game?: SortOrder
@@ -10358,6 +10386,7 @@ export namespace Prisma {
     availability?: SortOrder
     type?: SortOrder
     rarity?: SortOrder
+    property?: SortOrder
     description?: SortOrder
     icon?: SortOrder
     game?: SortOrder
@@ -11264,6 +11293,7 @@ export namespace Prisma {
     availability?: boolean
     type?: string | null
     rarity?: string | null
+    property?: string | null
     description?: string | null
     icon: string
     game?: string | null
@@ -11277,6 +11307,7 @@ export namespace Prisma {
     availability?: boolean
     type?: string | null
     rarity?: string | null
+    property?: string | null
     description?: string | null
     icon: string
     game?: string | null
@@ -11372,6 +11403,7 @@ export namespace Prisma {
     availability?: BoolFieldUpdateOperationsInput | boolean
     type?: NullableStringFieldUpdateOperationsInput | string | null
     rarity?: NullableStringFieldUpdateOperationsInput | string | null
+    property?: NullableStringFieldUpdateOperationsInput | string | null
     description?: NullableStringFieldUpdateOperationsInput | string | null
     icon?: StringFieldUpdateOperationsInput | string
     game?: NullableStringFieldUpdateOperationsInput | string | null
@@ -11385,6 +11417,7 @@ export namespace Prisma {
     availability?: BoolFieldUpdateOperationsInput | boolean
     type?: NullableStringFieldUpdateOperationsInput | string | null
     rarity?: NullableStringFieldUpdateOperationsInput | string | null
+    property?: NullableStringFieldUpdateOperationsInput | string | null
     description?: NullableStringFieldUpdateOperationsInput | string | null
     icon?: StringFieldUpdateOperationsInput | string
     game?: NullableStringFieldUpdateOperationsInput | string | null

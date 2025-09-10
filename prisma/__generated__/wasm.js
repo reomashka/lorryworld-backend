@@ -186,6 +186,7 @@ exports.Prisma.ItemScalarFieldEnum = {
   availability: 'availability',
   type: 'type',
   rarity: 'rarity',
+  property: 'property',
   description: 'description',
   icon: 'icon',
   game: 'game'

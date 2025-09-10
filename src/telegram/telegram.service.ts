@@ -21,6 +21,7 @@ export class TelegramService {
 	private chatMap: Record<string, string> = {
 		MM: this.configService.getOrThrow<string>('TG_CHAT_ID_MM'),
 		GAG: this.configService.getOrThrow<string>('TG_CHAT_ID_GAG'),
+		AM: this.configService.getOrThrow<string>('TG_CHAT_ID_AM'),
 		topup: this.configService.getOrThrow<string>('TG_CHAT_ID_TOPUP')
 	}
 
