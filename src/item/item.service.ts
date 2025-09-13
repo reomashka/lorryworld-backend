@@ -151,7 +151,7 @@ export class ItemService {
 					const itemList = orderWithItems.items
 						.map(
 							it =>
-								`🔹 <b>${it.item.name}</b>\n` +
+								`🔹 <b>${it.item.name}${it.item.property ? ` (${it.item.property})` : ''}</b>\n` +
 								`💰 Цена: ${it.item.price}₽` +
 								(it.quantity > 1
 									? ` (${it.item.price * it.quantity}₽)`
