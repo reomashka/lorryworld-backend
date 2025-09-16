@@ -107,10 +107,46 @@ export class AdminService {
 		}
 	}
 
+	private async getEarningsByGame(game: string) {
+		const { startOfToday, startOfYesterday, startOfWeek } =
+			this.getEarningsDateRanges()
+
+		const periods: { key: string; date: Date; end?: Date }[] = [
+			{ key: 'today', date: startOfToday },
+			{ key: 'yesterday', date: startOfYesterday, end: startOfToday },
+			{ key: 'week', date: startOfWeek }
+		]
+
+		const results = await Promise.all(
+			periods.map(period =>
+				this.prismaService.userItem.aggregate({
+					_sum: { amount: true },
+					where: {
+						status: ItemStatus.WITHDRAWN,
+						isIssued: true,
+						createdAt: period.end
+							? { gte: period.date, lt: period.end }
+							: { gte: period.date },
+						item: { is: { game } }
+					}
+				})
+			)
+		)
+
+		return {
+			today: results[0]._sum.amount || 0,
+			yesterday: results[1]._sum.amount || 0,
+			week: results[2]._sum.amount || 0
+		}
+	}
+
 	public async getDashboardStats(game: string) {
-		const earnings = await this.getDashboardAggregates('payment', {
-			status: PaymentStatus.SUCCESS
-		})
+		const earnings =
+			game === 'All'
+				? await this.getDashboardAggregates('payment', {
+						status: PaymentStatus.SUCCESS
+					})
+				: await this.getEarningsByGame(game)
 
 		const items = await this.getDashboardAggregates('userItem', {
 			status: ItemStatus.WITHDRAWN,
