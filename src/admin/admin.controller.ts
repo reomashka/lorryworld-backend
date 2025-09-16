@@ -1,4 +1,10 @@
-import { BadRequestException, Controller, Get, Query } from '@nestjs/common'
+import {
+	BadRequestException,
+	Controller,
+	Get,
+	Param,
+	Query
+} from '@nestjs/common'
 
 import { AdminService } from './admin.service'
 
@@ -6,9 +12,9 @@ import { AdminService } from './admin.service'
 export class AdminController {
 	constructor(private readonly adminService: AdminService) {}
 
-	@Get('stats')
-	public async getAllEarnings() {
-		return this.adminService.getDashboardStats()
+	@Get('stats/:game')
+	public async getAllEarnings(@Param('game') game: string) {
+		return this.adminService.getDashboardStats(game)
 	}
 
 	@Get('registrations')

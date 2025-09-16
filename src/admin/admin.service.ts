@@ -107,18 +107,18 @@ export class AdminService {
 		}
 	}
 
-	public async getDashboardStats() {
+	public async getDashboardStats(game: string) {
 		const earnings = await this.getDashboardAggregates('payment', {
 			status: PaymentStatus.SUCCESS
 		})
 
 		const items = await this.getDashboardAggregates('userItem', {
 			status: ItemStatus.WITHDRAWN,
-			isIssued: true
+			isIssued: true,
+			...(game !== 'All' ? { item: { is: { game } } } : {})
 		})
 
 		const registrations = await this.getDashboardAggregates('user', {})
-
 		return { earnings, items, registrations }
 	}
 
