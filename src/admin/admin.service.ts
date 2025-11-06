@@ -230,4 +230,8 @@ export class AdminService {
 			}
 		})
 	}
+
+	public async getAllSellers() {
+		return this.prismaService.seller.findMany()
+	}
 }

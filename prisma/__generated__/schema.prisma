@@ -67,6 +67,14 @@ model Order {
   @@map("orders")
 }
 
+model Seller {
+  id       Int    @id @default(autoincrement())
+  username String
+  game     String @default("MM")
+
+  @@map("sellers")
+}
+
 model Token {
   id        String    @id @default(uuid())
   email     String

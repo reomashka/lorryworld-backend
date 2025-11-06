@@ -42,4 +42,9 @@ export class AdminController {
 	) {
 		return this.adminService.getStatsAllPurchasedItems(period)
 	}
+
+	@Get('sellers')
+	public async getAllSellers() {
+		return this.adminService.getAllSellers()
+	}
 }

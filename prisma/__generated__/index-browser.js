@@ -157,6 +157,12 @@ exports.Prisma.OrderScalarFieldEnum = {
   createdAt: 'createdAt'
 };
 
+exports.Prisma.SellerScalarFieldEnum = {
+  id: 'id',
+  username: 'username',
+  game: 'game'
+};
+
 exports.Prisma.TokenScalarFieldEnum = {
   id: 'id',
   email: 'email',
@@ -253,6 +259,7 @@ exports.Prisma.ModelName = {
   User: 'User',
   UserItem: 'UserItem',
   Order: 'Order',
+  Seller: 'Seller',
   Token: 'Token',
   Payment: 'Payment',
   Item: 'Item'
