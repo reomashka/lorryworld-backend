@@ -1,4 +1,4 @@
-import { Controller, Get, Ip } from '@nestjs/common'
+import { Controller, Get, Ip, Req } from '@nestjs/common'
 
 import { GeoService } from './geo.service'
 
@@ -6,17 +6,9 @@ import { GeoService } from './geo.service'
 export class GeoController {
 	constructor(private readonly geoService: GeoService) {}
 
-	@Get()
+	@Get('')
 	getMyIp(@Ip() ip: string) {
-		const cleanIp = ip.replace(/^::ffff:/, '')
-
-		const language = this.geoService.detectLanguage(cleanIp)
-
-		console.log(`[GEO] IP=${cleanIp} LANG=${language}`)
-
-		return {
-			ip: cleanIp,
-			language
-		}
+		const clean = ip.replace(/^::ffff:/, '')
+		return { ip: clean }
 	}
 }
