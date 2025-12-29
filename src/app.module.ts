@@ -14,6 +14,7 @@ import { TelegramModule } from './telegram/telegram.module';
 import { AdminModule } from './admin/admin.module';
 import { OrderModule } from './order/order.module';
 import { LoggerModule } from './logger/logger.module';
+import { GeoModule } from './geo/geo.module';
 
 @Module({
 	imports: [
@@ -33,7 +34,8 @@ import { LoggerModule } from './logger/logger.module';
 		TelegramModule,
 		AdminModule,
 		OrderModule,
-		LoggerModule
+		LoggerModule,
+		GeoModule
 	]
 })
 export class AppModule {}

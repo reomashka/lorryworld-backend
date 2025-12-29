@@ -12,8 +12,6 @@ import { PaymentDto } from './dto/payment.dto'
 import { PaymentWebhookDto } from './dto/paymentWebhook.dto'
 import { PaymentService } from './payment.service'
 
-// ✅
-
 @Controller('payment')
 export class PaymentController {
 	constructor(private readonly paymentService: PaymentService) {}
