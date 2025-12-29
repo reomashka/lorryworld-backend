@@ -6,30 +6,16 @@ import { GeoService } from './geo.service'
 export class GeoController {
 	constructor(private readonly geoService: GeoService) {}
 
-	private detectLanguage(countryCode?: string): 'ru' | 'en' {
-		const ruCountries = ['RU', 'BY', 'KZ', 'UA']
-
-		if (!countryCode) return 'en'
-
-		return ruCountries.includes(countryCode) ? 'ru' : 'en'
-	}
-
 	@Get()
-	async getMyIp(@Ip() ip: string) {
+	getMyIp(@Ip() ip: string) {
 		const cleanIp = ip.replace(/^::ffff:/, '')
 
-		const res = await fetch(`https://ipapi.co/${cleanIp}/json/`)
-		const geo = await res.json()
+		const language = this.geoService.detectLanguage(cleanIp)
 
-		const language = this.detectLanguage(geo.country_code)
-
-		console.log(
-			`[GEO] IP=${cleanIp} COUNTRY=${geo.country_name} LANG=${language}`
-		)
+		console.log(`[GEO] IP=${cleanIp} LANG=${language}`)
 
 		return {
 			ip: cleanIp,
-			country: geo.country_name,
 			language
 		}
 	}
