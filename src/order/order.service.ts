@@ -121,7 +121,16 @@ export class OrderService {
 				items: {
 					select: {
 						quantity: true,
-						item: true
+						item: {
+							select: {
+								id: true,
+								name: true,
+								type: true,
+								rarity: true,
+								property: true,
+								game: true
+							}
+						}
 					}
 				}
 			}
