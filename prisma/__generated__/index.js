@@ -263,7 +263,7 @@ const config = {
       "value": "prisma-client-js"
     },
     "output": {
-      "value": "/home/romashka/Desktop/lorryworld/backend/prisma/__generated__",
+      "value": "/home/romashka/Desktop/ll/lorryworld-backend/prisma/__generated__",
       "fromEnvVar": null
     },
     "config": {
@@ -281,12 +281,11 @@ const config = {
       }
     ],
     "previewFeatures": [],
-    "sourceFilePath": "/home/romashka/Desktop/lorryworld/backend/prisma/schema.prisma",
+    "sourceFilePath": "/home/romashka/Desktop/ll/lorryworld-backend/prisma/schema.prisma",
     "isCustomOutput": true
   },
   "relativeEnvPaths": {
-    "rootEnvPath": null,
-    "schemaEnvPath": "../../.env"
+    "rootEnvPath": null
   },
   "relativePath": "..",
   "clientVersion": "6.9.0",
@@ -295,6 +294,7 @@ const config = {
     "db"
   ],
   "activeProvider": "postgresql",
+  "postinstall": true,
   "inlineDatasources": {
     "db": {
       "url": {

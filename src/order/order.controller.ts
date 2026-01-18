@@ -20,4 +20,9 @@ export class OrderController {
 	public async getActiveOrders(@Query('userId') userId: string) {
 		return this.orderService.getActiveOrders(userId)
 	}
+
+	@Get('active-for-bot')
+	public async getActiveOrdersForBot() {
+		return this.orderService.getActiveOrdersForBot()
+	}
 }

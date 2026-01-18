@@ -99,4 +99,32 @@ export class OrderService {
 			}
 		})
 	}
+
+	public async getActiveOrdersForBot() {
+		return await this.prismaService.order.findMany({
+			where: {
+				isIssued: false
+			},
+			orderBy: {
+				createdAt: 'asc'
+			},
+			select: {
+				id: true,
+				orderNumber: true,
+				createdAt: true,
+				user: {
+					select: {
+						displayName: true,
+						robloxUsername: true
+					}
+				},
+				items: {
+					select: {
+						quantity: true,
+						item: true
+					}
+				}
+			}
+		})
+	}
 }
