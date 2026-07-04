@@ -15,6 +15,9 @@ import { TelegramService } from '@/telegram/telegram.service'
 import { PaymentDto } from './dto/payment.dto'
 import {
 	PaymentWebhookDto,
+	PLATEGA_PAYMENT_METHODS,
+	PLATEGA_PAYMENT_STATUSES,
+	PlategaPaymentMethod,
 	PlategaPaymentStatus
 } from './dto/paymentWebhook.dto'
 
@@ -222,11 +225,24 @@ export class PaymentService {
 	}
 
 	public async handleWebhook(
-		payload: PaymentWebhookDto,
+		rawPayload: Record<string, unknown>,
 		merchantId?: string,
 		secret?: string
 	) {
 		this.assertPlategaWebhookAuth(merchantId, secret)
+
+		const payload = this.normalizeWebhookPayload(rawPayload)
+
+		this.logger.log(
+			`Platega webhook received: ${this.stringify({
+				id: payload.id,
+				amount: payload.amount,
+				currency: payload.currency,
+				status: payload.status,
+				paymentMethod: payload.paymentMethod,
+				payload: payload.payload
+			})}`
+		)
 
 		if (payload.paymentMethod !== PLATEGA_PAYMENT_METHOD) {
 			throw new BadRequestException('Unsupported Platega payment method')
@@ -270,6 +286,18 @@ export class PaymentService {
 
 			if (payment.status === statusPayment) {
 				return { statusPayment, data: payload, duplicate: true }
+			}
+
+			if (
+				payment.status === PaymentStatus.SUCCESS &&
+				(statusPayment === PaymentStatus.PENDING ||
+					statusPayment === PaymentStatus.CANCELLATION)
+			) {
+				return {
+					statusPayment: payment.status,
+					data: payload,
+					ignored: true
+				}
 			}
 
 			await tx.payment.update({
@@ -321,6 +349,110 @@ export class PaymentService {
 
 			return { statusPayment, data: payload }
 		})
+	}
+
+	private normalizeWebhookPayload(
+		rawPayload: Record<string, unknown>
+	): PaymentWebhookDto {
+		const id = this.readStringField(rawPayload, [
+			'id',
+			'Id',
+			'transactionId',
+			'TransactionId'
+		])
+		const amount = this.readNumberField(rawPayload.amount, 'amount')
+		const currency = this.readStringField(rawPayload, [
+			'currency',
+			'Currency'
+		]).toUpperCase()
+		const status = this.readStringField(rawPayload, [
+			'status',
+			'Status'
+		]).toUpperCase()
+		const paymentMethod = this.readNumberField(
+			rawPayload.paymentMethod ?? rawPayload.PaymentMethod,
+			'paymentMethod'
+		)
+
+		if (currency !== 'RUB') {
+			throw new BadRequestException('Unsupported Platega currency')
+		}
+
+		if (!this.isPlategaStatus(status)) {
+			throw new BadRequestException('Unsupported Platega status')
+		}
+
+		if (!this.isPlategaPaymentMethod(paymentMethod)) {
+			throw new BadRequestException('Unsupported Platega payment method')
+		}
+
+		return {
+			id,
+			amount,
+			currency,
+			status,
+			paymentMethod,
+			payload: this.readOptionalStringField(rawPayload.payload)
+		}
+	}
+
+	private readStringField(
+		payload: Record<string, unknown>,
+		keys: string[]
+	): string {
+		for (const key of keys) {
+			const value = payload[key]
+
+			if (typeof value === 'string' && value.trim()) {
+				return value.trim()
+			}
+		}
+
+		throw new BadRequestException(`${keys[0]} is required`)
+	}
+
+	private readOptionalStringField(value: unknown): string | undefined {
+		if (value === undefined || value === null) {
+			return undefined
+		}
+
+		if (typeof value === 'string') {
+			return value
+		}
+
+		return this.stringify(value)
+	}
+
+	private readNumberField(value: unknown, fieldName: string): number {
+		const parsedValue =
+			typeof value === 'number'
+				? value
+				: typeof value === 'string'
+					? Number(value)
+					: Number.NaN
+
+		if (!Number.isFinite(parsedValue)) {
+			throw new BadRequestException(`${fieldName} must be a number`)
+		}
+
+		return parsedValue
+	}
+
+	private isPlategaStatus(
+		status: string
+	): status is PlategaPaymentStatus {
+		return (PLATEGA_PAYMENT_STATUSES as readonly string[]).includes(status)
+	}
+
+	private isPlategaPaymentMethod(
+		paymentMethod: number
+	): paymentMethod is PlategaPaymentMethod {
+		return (
+			Number.isInteger(paymentMethod) &&
+			(PLATEGA_PAYMENT_METHODS as readonly number[]).includes(
+				paymentMethod
+			)
+		)
 	}
 
 	private buildCreateTransactionBody(

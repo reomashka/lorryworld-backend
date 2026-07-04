@@ -10,7 +10,6 @@ import {
 } from '@nestjs/common'
 
 import { PaymentDto } from './dto/payment.dto'
-import { PaymentWebhookDto } from './dto/paymentWebhook.dto'
 import { PaymentService } from './payment.service'
 
 @Controller('payment')
@@ -35,7 +34,7 @@ export class PaymentController {
 	@Post('webhook')
 	@HttpCode(HttpStatus.OK)
 	public async handle(
-		@Body() payload: PaymentWebhookDto,
+		@Body() payload: Record<string, unknown>,
 		@Headers('x-merchantid') merchantId?: string,
 		@Headers('x-secret') secret?: string
 	) {
