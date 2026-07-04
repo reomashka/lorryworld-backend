@@ -2,6 +2,7 @@ import {
 	Body,
 	Controller,
 	Get,
+	Headers,
 	HttpCode,
 	HttpStatus,
 	Param,
@@ -33,7 +34,15 @@ export class PaymentController {
 
 	@Post('webhook')
 	@HttpCode(HttpStatus.OK)
-	public async handle(@Body() payload: PaymentWebhookDto) {
-		return await this.paymentService.handleWebhook(payload)
+	public async handle(
+		@Body() payload: PaymentWebhookDto,
+		@Headers('x-merchantid') merchantId?: string,
+		@Headers('x-secret') secret?: string
+	) {
+		return await this.paymentService.handleWebhook(
+			payload,
+			merchantId,
+			secret
+		)
 	}
 }

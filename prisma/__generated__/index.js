@@ -263,7 +263,7 @@ const config = {
       "value": "prisma-client-js"
     },
     "output": {
-      "value": "/home/romashka/Desktop/ll/lorryworld-backend/prisma/__generated__",
+      "value": "/home/romashka/Desktop/lw-backend/prisma/__generated__",
       "fromEnvVar": null
     },
     "config": {
@@ -281,7 +281,7 @@ const config = {
       }
     ],
     "previewFeatures": [],
-    "sourceFilePath": "/home/romashka/Desktop/ll/lorryworld-backend/prisma/schema.prisma",
+    "sourceFilePath": "/home/romashka/Desktop/lw-backend/prisma/schema.prisma",
     "isCustomOutput": true
   },
   "relativeEnvPaths": {

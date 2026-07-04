@@ -1,7 +1,11 @@
-import { BadRequestException, Injectable } from '@nestjs/common'
+import {
+	BadRequestException,
+	Injectable,
+	UnauthorizedException
+} from '@nestjs/common'
 import { ConfigService } from '@nestjs/config'
 import { PaymentStatus, PaymentType } from '@prisma/__generated__'
-import { createHmac } from 'crypto'
+import { timingSafeEqual } from 'crypto'
 import { v4 as uuidv4 } from 'uuid'
 
 import { LoggerService } from '@/logger/logger.service'
@@ -9,7 +13,68 @@ import { PrismaService } from '@/prisma/prisma.service'
 import { TelegramService } from '@/telegram/telegram.service'
 
 import { PaymentDto } from './dto/payment.dto'
-import { PaymentWebhookDto } from './dto/paymentWebhook.dto'
+import {
+	PaymentWebhookDto,
+	PlategaPaymentStatus
+} from './dto/paymentWebhook.dto'
+
+const PLATEGA_BASE_URL = 'https://app.platega.io'
+const PLATEGA_PAYMENT_METHOD = 2
+
+type PlategaCreateTransactionRequest = {
+	paymentMethod: typeof PLATEGA_PAYMENT_METHOD
+	paymentDetails: {
+		amount: number
+		currency: 'RUB'
+	}
+	description: string
+	return?: string
+	failedUrl?: string
+	payload: string
+	metadata: {
+		userId: string
+		userName?: string
+	}
+}
+
+type PlategaCreateTransactionResponse = {
+	paymentMethod?: string
+	transactionId: string
+	redirect?: string
+	url?: string
+	return?: string
+	paymentDetails?: string
+	status?: PlategaPaymentStatus
+	expiresIn?: string
+	merchantId?: string
+	usdtRate?: number
+	rate?: number
+}
+
+type PlategaTransactionStatusResponse = {
+	id: string
+	status: PlategaPaymentStatus
+	paymentDetails: {
+		amount: number
+		currency: string
+	}
+	merchantName?: string
+	merchantId?: string
+	paymentMethod?: string
+	expiresIn?: string
+	return?: string
+	qr?: string
+	payformSuccessUrl?: string
+	payload?: string
+	externalId?: string
+	description?: string
+}
+
+type PlategaApiError = {
+	error?: unknown
+	message?: unknown
+	errors?: unknown
+}
 
 @Injectable()
 export class PaymentService {
@@ -20,145 +85,127 @@ export class PaymentService {
 		private readonly logger: LoggerService
 	) {}
 
-	private async generateSignature(payload: string) {
-		const secret = this.configService.getOrThrow<string>('LAVA_SECRET_KEY')
-		return createHmac('sha256', secret).update(payload).digest('hex')
-	}
-
 	public async createPayment(dto: PaymentDto) {
-		const PAYMENT_URL = 'https://api.lava.ru/business/invoice/create'
-		const LavaShopID = this.configService.getOrThrow<string>('LAVA_SHOP_ID')
+		const amount = Number(dto.amount)
+		const currency = dto.currency ?? 'RUB'
 
-		if (!dto.amount) {
-			throw new BadRequestException()
+		if (!Number.isInteger(amount) || amount <= 0) {
+			throw new BadRequestException('Некорректная сумма платежа')
 		}
 
-		const formattedAmount = Number(dto.amount).toFixed(2)
+		const requestBody = this.buildCreateTransactionBody(
+			dto,
+			amount,
+			currency
+		)
 		const orderId = uuidv4()
 
-		const params = {
-			sum: formattedAmount,
-			orderId: orderId,
-			shopId: LavaShopID
-		}
-
-		const json = JSON.stringify({ ...params })
-		const signature = await this.generateSignature(json)
-
 		try {
-			const response = await fetch(PAYMENT_URL, {
-				method: 'POST',
-				headers: {
-					'Content-Type': 'application/json',
-					Accept: 'application/json',
-					Signature: signature
-				},
-				body: json
-			})
+			const response = await fetch(
+				`${PLATEGA_BASE_URL}/transaction/process`,
+				{
+					method: 'POST',
+					headers: this.getPlategaHeaders(),
+					body: JSON.stringify(requestBody)
+				}
+			)
 
-			const result = await response.json()
+			const result =
+				await this.parsePlategaResponse<
+					PlategaCreateTransactionResponse | PlategaApiError
+				>(response)
 
 			if (!response.ok) {
-				this.logger.error(`API Error Response: ${result}`)
+				this.logger.error(
+					`Platega API error response: ${this.stringify(result)}`
+				)
 				throw new BadRequestException(
-					`HTTP error! status: ${response.status}`
+					`Platega HTTP error! status: ${response.status}`
 				)
 			}
 
-			if (!result.data || !result.data.id) {
-				this.logger.error(`Lava API returned no data: ${result}`)
+			if (!this.isCreateTransactionResponse(result)) {
+				this.logger.error(
+					`Platega returned invalid transaction response: ${this.stringify(result)}`
+				)
 				throw new BadRequestException(
-					'Lava API error: ' + JSON.stringify(result?.error || result)
+					'Platega API error: invalid transaction response'
 				)
 			}
-			const amountInt = Math.floor(Number(dto.amount))
 
 			const payment = await this.prismaService.payment.create({
 				data: {
 					id: orderId,
-					invoiceId: result.data.id,
+					invoiceId: result.transactionId,
 					userId: dto.userId,
-					amount: amountInt,
+					amount,
 					status: PaymentStatus.PENDING,
 					type: PaymentType.DEPOSIT,
-					currency: 'RUB',
-					createdAt: new Date(Date.now())
+					currency,
+					createdAt: new Date()
 				}
 			})
+			const paymentUrl = result.redirect ?? result.url
 
 			return {
-				resultPayment: result,
-				paymentInfo: payment
+				resultPayment: {
+					...result,
+					data: {
+						id: result.transactionId,
+						url: paymentUrl,
+						paymentUrl
+					}
+				},
+				paymentInfo: payment,
+				transactionId: result.transactionId,
+				paymentUrl
 			}
-		} catch (err) {
-			this.logger.error(err)
-			throw err
+		} catch (error) {
+			this.logger.error(this.stringify(error))
+			throw error
 		}
 	}
 
 	public async getInfoOfPayment(invoiceId: string) {
-		const PAYMENT_URL = 'https://api.morune.com/invoice/info'
-
 		if (!invoiceId) {
-			throw new BadRequestException()
+			throw new BadRequestException('invoiceId обязателен')
 		}
 
-		const queryParams = new URLSearchParams({
-			shop_id: this.configService.getOrThrow<string>('MORUNE_SHOP_ID'),
-			invoice_id: invoiceId
-		}).toString()
-
-		const urlWithParams = `${PAYMENT_URL}?${queryParams}`
-
 		try {
-			const response = await fetch(urlWithParams, {
-				method: 'GET',
-				headers: {
-					'Content-Type': 'application/json',
-					'x-api-key':
-						this.configService.getOrThrow<string>('MORUNE_API_KEY')
+			const response = await fetch(
+				`${PLATEGA_BASE_URL}/transaction/${encodeURIComponent(invoiceId)}`,
+				{
+					method: 'GET',
+					headers: this.getPlategaHeaders()
 				}
-			})
+			)
 
-			const result = await response.json()
+			const result =
+				await this.parsePlategaResponse<
+					PlategaTransactionStatusResponse | PlategaApiError
+				>(response)
 
 			if (!response.ok) {
-				this.logger.error(`API Error Response: ${result}`)
+				this.logger.error(
+					`Platega API error response: ${this.stringify(result)}`
+				)
 
 				throw new BadRequestException(
-					`HTTP error! status: ${response.status}`
+					`Platega HTTP error! status: ${response.status}`
 				)
 			}
 
 			const payment = await this.prismaService.payment.findUnique({
 				where: {
-					invoiceId: invoiceId
+					invoiceId
 				}
 			})
 
-			return { ...result }
-		} catch (err) {
-			this.logger.error(err)
-			throw err
+			return { ...result, paymentInfo: payment }
+		} catch (error) {
+			this.logger.error(this.stringify(error))
+			throw error
 		}
-	}
-
-	async updatePaymentStatus(payload) {
-		this.logger.log(`Payload received: ${JSON.stringify(payload)}`)
-		if (payload.code === 1) {
-			const paymentUpdate = await this.prismaService.payment.update({
-				where: {
-					invoiceId: payload.invoice_id
-				},
-
-				data: {
-					status: PaymentStatus.SUCCESS
-				}
-			})
-			return paymentUpdate
-		}
-
-		return { msg: 'Не удалось получить данные с платежной системы.' }
 	}
 
 	public async getPaymentsOfUser(userId: string) {
@@ -174,80 +221,88 @@ export class PaymentService {
 		return userWithPayments?.payments || []
 	}
 
-	// webhook
-	public async handleWebhook(payload: PaymentWebhookDto) {
-		let statusPayment: PaymentStatus
+	public async handleWebhook(
+		payload: PaymentWebhookDto,
+		merchantId?: string,
+		secret?: string
+	) {
+		this.assertPlategaWebhookAuth(merchantId, secret)
 
-		switch (payload.status) {
-			case 'success':
-				statusPayment =
-					payload.status === 'success'
-						? PaymentStatus.SUCCESS
-						: PaymentStatus.UNKNOWN
-				break
-			case 'error':
-				statusPayment =
-					payload.status === 'error'
-						? PaymentStatus.CANCELLATION
-						: PaymentStatus.UNKNOWN
-				break
-			case 'cancel':
-				statusPayment =
-					payload.status === 'cancel'
-						? PaymentStatus.CANCELLATION
-						: PaymentStatus.UNKNOWN
-				break
-			case 'pending':
-				statusPayment =
-					payload.status === 'pending'
-						? PaymentStatus.PENDING
-						: PaymentStatus.UNKNOWN
-				break
-			default:
-				statusPayment = PaymentStatus.UNKNOWN
+		if (payload.paymentMethod !== PLATEGA_PAYMENT_METHOD) {
+			throw new BadRequestException('Unsupported Platega payment method')
 		}
 
-		// Вся логика в транзакции
+		const statusPayment = this.mapPlategaStatus(payload.status)
+
 		return await this.prismaService.$transaction(async tx => {
 			const payment = await tx.payment.findUnique({
-				where: { invoiceId: payload.invoice_id }
+				where: { invoiceId: payload.id }
 			})
 
 			if (!payment) {
 				this.logger.error(
-					`❌ Платеж не найден c invoiceId: ${payload.invoice_id} не найден`
+					`Платеж Platega не найден, transactionId: ${payload.id}`
 				)
-				throw new Error(
-					`Payment with invoiceId ${payload.invoice_id} not found`
+				throw new BadRequestException(
+					`Payment with transactionId ${payload.id} not found`
 				)
 			}
 
-			// 🧾 Обновляем статус платежа
+			if (
+				statusPayment === PaymentStatus.SUCCESS &&
+				payload.amount !== payment.amount
+			) {
+				this.logger.error(
+					`Platega amount mismatch for ${payload.id}: callback=${payload.amount}, payment=${payment.amount}`
+				)
+				throw new BadRequestException('Payment amount mismatch')
+			}
+
+			if (
+				statusPayment === PaymentStatus.SUCCESS &&
+				payload.currency !== payment.currency
+			) {
+				this.logger.error(
+					`Platega currency mismatch for ${payload.id}: callback=${payload.currency}, payment=${payment.currency}`
+				)
+				throw new BadRequestException('Payment currency mismatch')
+			}
+
+			if (payment.status === statusPayment) {
+				return { statusPayment, data: payload, duplicate: true }
+			}
+
 			await tx.payment.update({
-				where: { invoiceId: payload.invoice_id },
+				where: { invoiceId: payload.id },
 				data: { status: statusPayment }
 			})
+
 			this.logger.log(
-				`Статус платежа (IvoiceID - ${payload.invoice_id}) - ${statusPayment}`
+				`Статус платежа Platega (${payload.id}) - ${statusPayment}`
 			)
 
-			// 💰 Если платеж успешен — пополняем баланс
-			if (statusPayment === PaymentStatus.SUCCESS) {
+			const shouldCreditBalance =
+				statusPayment === PaymentStatus.SUCCESS &&
+				payment.status !== PaymentStatus.SUCCESS &&
+				payment.status !== PaymentStatus.REFUNDED
+
+			if (shouldCreditBalance) {
 				const user = await tx.user.findUnique({
 					where: { id: payment.userId },
 					select: { balance: true }
 				})
 
-				const amountNumber = Math.ceil(parseFloat(payload.amount))
-				this.logger.log(
-					`Текущий баланс пользователя: ${user?.balance}, Добавлено: ${amountNumber}`
-				)
+				if (!user) {
+					throw new BadRequestException(
+						`User with id ${payment.userId} not found`
+					)
+				}
 
 				await tx.user.update({
 					where: { id: payment.userId },
 					data: {
 						balance: {
-							increment: amountNumber
+							increment: payment.amount
 						}
 					}
 				})
@@ -255,8 +310,10 @@ export class PaymentService {
 				await this.telegramService.sendMessage(
 					`<b>💳 Пополнение баланса</b>\n\n` +
 						`👤 <b>Пользователь ID:</b> <code>${payment.userId}</code>\n` +
-						`💰 <b>Сумма пополнения:</b> ${amountNumber}₽\n\n` +
-						`📥 <b>Баланс после пополнения:</b> ${user.balance + amountNumber}₽\n`,
+						`💰 <b>Сумма пополнения:</b> ${payment.amount}₽\n\n` +
+						`📥 <b>Баланс после пополнения:</b> ${
+							user.balance + payment.amount
+						}₽\n`,
 					false,
 					'topup'
 				)
@@ -264,5 +321,153 @@ export class PaymentService {
 
 			return { statusPayment, data: payload }
 		})
+	}
+
+	private buildCreateTransactionBody(
+		dto: PaymentDto,
+		amount: number,
+		currency: 'RUB'
+	): PlategaCreateTransactionRequest {
+		const requestBody: PlategaCreateTransactionRequest = {
+			paymentMethod: PLATEGA_PAYMENT_METHOD,
+			paymentDetails: {
+				amount,
+				currency
+			},
+			description:
+				dto.description ?? `Пополнение баланса пользователя ${dto.userId}`,
+			payload: dto.payload ?? dto.userId,
+			metadata: {
+				userId: dto.userId
+			}
+		}
+
+		const returnUrl =
+			dto.returnUrl ?? this.configService.get<string>('PLATEGA_RETURN_URL')
+		const failedUrl =
+			dto.failedUrl ?? this.configService.get<string>('PLATEGA_FAILED_URL')
+
+		if (returnUrl) {
+			requestBody.return = returnUrl
+		}
+
+		if (failedUrl) {
+			requestBody.failedUrl = failedUrl
+		}
+
+		if (dto.userName) {
+			requestBody.metadata.userName = dto.userName
+		}
+
+		return requestBody
+	}
+
+	private mapPlategaStatus(status: PlategaPaymentStatus): PaymentStatus {
+		switch (status) {
+			case 'PENDING':
+				return PaymentStatus.PENDING
+			case 'CONFIRMED':
+				return PaymentStatus.SUCCESS
+			case 'CANCELED':
+				return PaymentStatus.CANCELLATION
+			case 'CHARGEBACKED':
+				return PaymentStatus.REFUNDED
+			default:
+				return PaymentStatus.UNKNOWN
+		}
+	}
+
+	private getPlategaHeaders(): Record<string, string> {
+		return {
+			Accept: 'application/json',
+			'Content-Type': 'application/json',
+			'X-MerchantId':
+				this.configService.getOrThrow<string>('PLATEGA_MERCHANT_ID'),
+			'X-Secret': this.getPlategaSecret()
+		}
+	}
+
+	private getPlategaSecret(): string {
+		const secret =
+			this.configService.get<string>('PLATEGA_SECRET') ??
+			this.configService.get<string>('PLATEGA_API_KEY') ??
+			this.configService.get<string>('PLATEGA_API')
+
+		if (!secret) {
+			throw new Error(
+				'PLATEGA_SECRET, PLATEGA_API_KEY or PLATEGA_API is not configured'
+			)
+		}
+
+		return secret
+	}
+
+	private assertPlategaWebhookAuth(
+		merchantId?: string,
+		secret?: string
+	): void {
+		const validMerchantId = this.safeCompare(
+			merchantId,
+			this.configService.getOrThrow<string>('PLATEGA_MERCHANT_ID')
+		)
+		const validSecret = this.safeCompare(secret, this.getPlategaSecret())
+
+		if (!validMerchantId || !validSecret) {
+			throw new UnauthorizedException('Invalid Platega webhook headers')
+		}
+	}
+
+	private safeCompare(actual?: string, expected?: string): boolean {
+		if (!actual || !expected) {
+			return false
+		}
+
+		const actualBuffer = Buffer.from(actual)
+		const expectedBuffer = Buffer.from(expected)
+
+		if (actualBuffer.length !== expectedBuffer.length) {
+			return false
+		}
+
+		return timingSafeEqual(actualBuffer, expectedBuffer)
+	}
+
+	private isCreateTransactionResponse(
+		result: PlategaCreateTransactionResponse | PlategaApiError
+	): result is PlategaCreateTransactionResponse {
+		return (
+			'transactionId' in result &&
+			typeof result.transactionId === 'string'
+		)
+	}
+
+	private async parsePlategaResponse<T>(response: Response): Promise<T> {
+		const text = await response.text()
+
+		if (!text) {
+			return {} as T
+		}
+
+		try {
+			return JSON.parse(text) as T
+		} catch {
+			throw new BadRequestException('Invalid Platega JSON response')
+		}
+	}
+
+	private stringify(value: unknown): string {
+		if (value instanceof Error) {
+			return value.stack ?? value.message
+		}
+
+		if (typeof value === 'string') {
+			return value
+		}
+
+		try {
+			return JSON.stringify(value)
+		} catch {
+			return String(value)
+		}
 	}
 }
