@@ -1,4 +1,5 @@
 import {
+	BadRequestException,
 	ConflictException,
 	Injectable,
 	InternalServerErrorException,
@@ -69,9 +70,8 @@ export class AuthService {
 	}
 
 	public async login(req: Request, dto: LoginDto) {
-		const user = await this.userService.findByEmailOrDisplayName(
-			dto.email || dto.name
-		)
+		const identifier = this.getLoginIdentifier(dto)
+		const user = await this.userService.findByEmailOrDisplayName(identifier)
 
 		if (!user || !user.password) {
 			throw new NotFoundException(
@@ -79,20 +79,7 @@ export class AuthService {
 			)
 		}
 
-		const isValidPassword = async (
-			userPassword: string,
-			inputPassword: string
-		) => {
-			try {
-				return userPassword.startsWith('$')
-					? await verify(userPassword, inputPassword)
-					: userPassword === inputPassword
-			} catch {
-				return false
-			}
-		}
-
-		if (!isValidPassword) {
+		if (!(await this.isValidPassword(user.password, dto.password))) {
 			throw new UnauthorizedException('Неверный пароль.')
 		}
 
@@ -104,6 +91,30 @@ export class AuthService {
 		// }
 
 		return this.saveSession(req, user)
+	}
+
+	private getLoginIdentifier(dto: LoginDto): string {
+		const identifier =
+			dto.identifier ?? dto.email ?? dto.name ?? dto.displayName
+
+		if (typeof identifier !== 'string' || !identifier.trim()) {
+			throw new BadRequestException('Укажите email или имя пользователя.')
+		}
+
+		return identifier.trim()
+	}
+
+	private async isValidPassword(
+		userPassword: string,
+		inputPassword: string
+	): Promise<boolean> {
+		try {
+			return userPassword.startsWith('$')
+				? await verify(userPassword, inputPassword)
+				: userPassword === inputPassword
+		} catch {
+			return false
+		}
 	}
 
 	public async logout(req: Request, res: Response): Promise<void> {
