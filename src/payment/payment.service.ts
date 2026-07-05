@@ -23,6 +23,7 @@ import {
 
 const PLATEGA_BASE_URL = 'https://app.platega.io'
 const PLATEGA_PAYMENT_METHOD = 2
+const PLATEGA_DEFAULT_COMMISSION_PERCENT = 3.5
 
 type PlategaCreateTransactionRequest = {
 	paymentMethod: typeof PLATEGA_PAYMENT_METHOD
@@ -113,10 +114,9 @@ export class PaymentService {
 				}
 			)
 
-			const result =
-				await this.parsePlategaResponse<
-					PlategaCreateTransactionResponse | PlategaApiError
-				>(response)
+			const result = await this.parsePlategaResponse<
+				PlategaCreateTransactionResponse | PlategaApiError
+			>(response)
 
 			if (!response.ok) {
 				this.logger.error(
@@ -183,10 +183,9 @@ export class PaymentService {
 				}
 			)
 
-			const result =
-				await this.parsePlategaResponse<
-					PlategaTransactionStatusResponse | PlategaApiError
-				>(response)
+			const result = await this.parsePlategaResponse<
+				PlategaTransactionStatusResponse | PlategaApiError
+			>(response)
 
 			if (!response.ok) {
 				this.logger.error(
@@ -266,10 +265,14 @@ export class PaymentService {
 
 			if (
 				statusPayment === PaymentStatus.SUCCESS &&
-				payload.amount !== payment.amount
+				!this.isConfirmedAmountValid(payload.amount, payment.amount)
 			) {
+				const allowedAmounts = this.getAllowedConfirmedAmounts(
+					payment.amount
+				)
+
 				this.logger.error(
-					`Platega amount mismatch for ${payload.id}: callback=${payload.amount}, payment=${payment.amount}`
+					`Platega amount mismatch for ${payload.id}: callback=${payload.amount}, allowed=${allowedAmounts.join(', ')}`
 				)
 				throw new BadRequestException('Payment amount mismatch')
 			}
@@ -438,9 +441,7 @@ export class PaymentService {
 		return parsedValue
 	}
 
-	private isPlategaStatus(
-		status: string
-	): status is PlategaPaymentStatus {
+	private isPlategaStatus(status: string): status is PlategaPaymentStatus {
 		return (PLATEGA_PAYMENT_STATUSES as readonly string[]).includes(status)
 	}
 
@@ -455,6 +456,54 @@ export class PaymentService {
 		)
 	}
 
+	private isConfirmedAmountValid(
+		callbackAmount: number,
+		paymentAmount: number
+	): boolean {
+		const callbackAmountKopecks = this.toKopecks(callbackAmount)
+
+		return this.getAllowedConfirmedAmounts(paymentAmount)
+			.map(amount => this.toKopecks(amount))
+			.includes(callbackAmountKopecks)
+	}
+
+	private getAllowedConfirmedAmounts(paymentAmount: number): number[] {
+		const amountWithCommission =
+			paymentAmount * (1 + this.getPlategaCommissionPercent() / 100)
+		const roundedAmountWithCommission =
+			this.toKopecks(amountWithCommission) / 100
+
+		if (roundedAmountWithCommission === paymentAmount) {
+			return [paymentAmount]
+		}
+
+		return [paymentAmount, roundedAmountWithCommission]
+	}
+
+	private getPlategaCommissionPercent(): number {
+		const rawCommissionPercent = this.configService.get<string | number>(
+			'PLATEGA_COMMISSION_PERCENT'
+		)
+
+		if (rawCommissionPercent === undefined) {
+			return PLATEGA_DEFAULT_COMMISSION_PERCENT
+		}
+
+		const commissionPercent = Number(
+			String(rawCommissionPercent).replace(',', '.')
+		)
+
+		if (!Number.isFinite(commissionPercent) || commissionPercent < 0) {
+			return PLATEGA_DEFAULT_COMMISSION_PERCENT
+		}
+
+		return commissionPercent
+	}
+
+	private toKopecks(amount: number): number {
+		return Math.round(amount * 100)
+	}
+
 	private buildCreateTransactionBody(
 		dto: PaymentDto,
 		amount: number,
@@ -467,7 +516,8 @@ export class PaymentService {
 				currency
 			},
 			description:
-				dto.description ?? `Пополнение баланса пользователя ${dto.userId}`,
+				dto.description ??
+				`Пополнение баланса пользователя ${dto.userId}`,
 			payload: dto.payload ?? dto.userId,
 			metadata: {
 				userId: dto.userId
@@ -475,9 +525,11 @@ export class PaymentService {
 		}
 
 		const returnUrl =
-			dto.returnUrl ?? this.configService.get<string>('PLATEGA_RETURN_URL')
+			dto.returnUrl ??
+			this.configService.get<string>('PLATEGA_RETURN_URL')
 		const failedUrl =
-			dto.failedUrl ?? this.configService.get<string>('PLATEGA_FAILED_URL')
+			dto.failedUrl ??
+			this.configService.get<string>('PLATEGA_FAILED_URL')
 
 		if (returnUrl) {
 			requestBody.return = returnUrl
@@ -513,8 +565,9 @@ export class PaymentService {
 		return {
 			Accept: 'application/json',
 			'Content-Type': 'application/json',
-			'X-MerchantId':
-				this.configService.getOrThrow<string>('PLATEGA_MERCHANT_ID'),
+			'X-MerchantId': this.configService.getOrThrow<string>(
+				'PLATEGA_MERCHANT_ID'
+			),
 			'X-Secret': this.getPlategaSecret()
 		}
 	}

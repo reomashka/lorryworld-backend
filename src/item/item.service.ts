@@ -41,61 +41,94 @@ export class ItemService {
 	}
 
 	public async buyItem(dto: CreateUserItemDto) {
-		const item = await this.prismaService.item.findUnique({
-			where: {
-				id: dto.itemId
-			}
-		})
-
-		const user = await this.prismaService.user.findUnique({
-			where: {
-				id: dto.userId
-			}
-		})
-
-		if (!item || !user) {
-			throw new NotFoundException('user or item not found')
-		}
-
-		const priceToUse = item.sale > 0 ? item.sale : item.price
-		const totalPrice = priceToUse * dto.quantity
-
-		if (user.balance < totalPrice) {
-			throw new BadRequestException('Недостаточно средств на балансе.')
-		}
-
-		const result = await this.prismaService.$transaction([
-			this.prismaService.user.update({
+		const result = await this.prismaService.$transaction(async prisma => {
+			const item = await prisma.item.findUnique({
 				where: {
-					id: dto.userId
+					id: dto.itemId
+				}
+			})
+
+			if (!item) {
+				throw new NotFoundException('item not found')
+			}
+
+			if (!item.availability) {
+				throw new BadRequestException('Товар недоступен для покупки.')
+			}
+
+			const priceToUse = (item.sale ?? 0) > 0 ? item.sale : item.price
+			const totalPrice = priceToUse * dto.quantity
+
+			if (!Number.isSafeInteger(totalPrice) || totalPrice <= 0) {
+				throw new BadRequestException('Некорректная цена товара.')
+			}
+
+			const balanceUpdate = await prisma.user.updateMany({
+				where: {
+					id: dto.userId,
+					balance: {
+						gte: totalPrice
+					}
 				},
 				data: {
 					balance: { decrement: totalPrice }
 				}
-			}),
+			})
 
-			this.prismaService.userItem.create({
+			if (balanceUpdate.count === 0) {
+				const userExists = await prisma.user.findUnique({
+					where: {
+						id: dto.userId
+					},
+					select: {
+						id: true
+					}
+				})
+
+				if (!userExists) {
+					throw new NotFoundException('user not found')
+				}
+
+				throw new BadRequestException(
+					'Недостаточно средств на балансе.'
+				)
+			}
+
+			const userItem = await prisma.userItem.create({
 				data: {
 					userId: dto.userId,
 					itemId: dto.itemId,
 					quantity: dto.quantity,
-					amount: dto.amount
+					amount: totalPrice
 				}
 			})
-		])
+
+			const user = await prisma.user.findUnique({
+				where: {
+					id: dto.userId
+				}
+			})
+
+			if (!user) {
+				throw new NotFoundException('user not found')
+			}
+
+			return { item, totalPrice, user, userItem }
+		})
 
 		await this.telegramService.sendMessage(
-			`🛒 Пользователь ${user.displayName} купил предмет\n\n` +
-				` <b>${item.name}</b> (${dto.quantity} шт.) на сумму ${totalPrice}₽\n` +
-				` <b>ID пользователя:</b> ${user.id}\n` +
-				` <b>Ник на сайте:</b> ${user.displayName}\n`,
+			`🛒 Пользователь ${result.user.displayName} купил предмет\n\n` +
+				` <b>${result.item.name}</b> (${dto.quantity} шт.) на сумму ${result.totalPrice}₽\n` +
+				` <b>ID пользователя:</b> ${result.user.id}\n` +
+				` <b>Ник на сайте:</b> ${result.user.displayName}\n`,
 			false,
-			item.game
+			result.item.game
 		)
 		this.logger.log(
-			`Покупка пользователем ${item.name} (${dto.quantity} шт.)[User ID: ${dto.userId}]`
+			`Покупка пользователем ${result.item.name} (${dto.quantity} шт.)[User ID: ${dto.userId}]`
 		)
-		return result
+
+		return [result.user, result.userItem]
 	}
 
 	public async withdrawItem(dto: WithdrawItemsDto) {
