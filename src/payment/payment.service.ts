@@ -15,7 +15,6 @@ import { TelegramService } from '@/telegram/telegram.service'
 import { PaymentDto, type PaymentMethod } from './dto/payment.dto'
 import {
 	PaymentWebhookDto,
-	PLATEGA_PAYMENT_METHODS,
 	PLATEGA_PAYMENT_STATUSES,
 	PlategaPaymentMethod,
 	PlategaPaymentStatus
@@ -30,7 +29,6 @@ const PLATEGA_SUPPORTED_PAYMENT_METHODS = [
 	PLATEGA_PAYMENT_METHOD_BY_PAYMENT_METHOD.sbp,
 	PLATEGA_PAYMENT_METHOD_BY_PAYMENT_METHOD.card
 ] as const
-const PLATEGA_DEFAULT_COMMISSION_PERCENT = 3.5
 
 type SupportedPlategaPaymentMethod =
 	(typeof PLATEGA_SUPPORTED_PAYMENT_METHODS)[number]
@@ -253,10 +251,6 @@ export class PaymentService {
 			})}`
 		)
 
-		if (!this.isSupportedPlategaPaymentMethod(payload.paymentMethod)) {
-			throw new BadRequestException('Unsupported Platega payment method')
-		}
-
 		const statusPayment = this.mapPlategaStatus(payload.status)
 
 		return await this.prismaService.$transaction(async tx => {
@@ -271,30 +265,6 @@ export class PaymentService {
 				throw new BadRequestException(
 					`Payment with transactionId ${payload.id} not found`
 				)
-			}
-
-			if (
-				statusPayment === PaymentStatus.SUCCESS &&
-				!this.isConfirmedAmountValid(payload.amount, payment.amount)
-			) {
-				const allowedAmounts = this.getAllowedConfirmedAmounts(
-					payment.amount
-				)
-
-				this.logger.error(
-					`Platega amount mismatch for ${payload.id}: callback=${payload.amount}, allowed=${allowedAmounts.join(', ')}`
-				)
-				throw new BadRequestException('Payment amount mismatch')
-			}
-
-			if (
-				statusPayment === PaymentStatus.SUCCESS &&
-				payload.currency !== payment.currency
-			) {
-				this.logger.error(
-					`Platega currency mismatch for ${payload.id}: callback=${payload.currency}, payment=${payment.currency}`
-				)
-				throw new BadRequestException('Payment currency mismatch')
 			}
 
 			if (payment.status === statusPayment) {
@@ -373,30 +343,20 @@ export class PaymentService {
 			'transactionId',
 			'TransactionId'
 		])
-		const amount = this.readNumberField(rawPayload.amount, 'amount')
-		const currency = this.readStringField(rawPayload, [
-			'currency',
-			'Currency'
-		]).toUpperCase()
+		const amount = this.readOptionalNumberField(rawPayload.amount)
+		const currency = this.readOptionalStringField(
+			rawPayload.currency ?? rawPayload.Currency
+		)?.toUpperCase()
 		const status = this.readStringField(rawPayload, [
 			'status',
 			'Status'
 		]).toUpperCase()
-		const paymentMethod = this.readNumberField(
-			rawPayload.paymentMethod ?? rawPayload.PaymentMethod,
-			'paymentMethod'
+		const paymentMethod = this.readOptionalNumberField(
+			rawPayload.paymentMethod ?? rawPayload.PaymentMethod
 		)
-
-		if (currency !== 'RUB') {
-			throw new BadRequestException('Unsupported Platega currency')
-		}
 
 		if (!this.isPlategaStatus(status)) {
 			throw new BadRequestException('Unsupported Platega status')
-		}
-
-		if (!this.isPlategaPaymentMethod(paymentMethod)) {
-			throw new BadRequestException('Unsupported Platega payment method')
 		}
 
 		return {
@@ -424,6 +384,17 @@ export class PaymentService {
 		throw new BadRequestException(`${keys[0]} is required`)
 	}
 
+	private readOptionalNumberField(value: unknown): number | undefined {
+		const parsedValue =
+			typeof value === 'number'
+				? value
+				: typeof value === 'string'
+					? Number(value)
+					: Number.NaN
+
+		return Number.isFinite(parsedValue) ? parsedValue : undefined
+	}
+
 	private readOptionalStringField(value: unknown): string | undefined {
 		if (value === undefined || value === null) {
 			return undefined
@@ -436,91 +407,8 @@ export class PaymentService {
 		return this.stringify(value)
 	}
 
-	private readNumberField(value: unknown, fieldName: string): number {
-		const parsedValue =
-			typeof value === 'number'
-				? value
-				: typeof value === 'string'
-					? Number(value)
-					: Number.NaN
-
-		if (!Number.isFinite(parsedValue)) {
-			throw new BadRequestException(`${fieldName} must be a number`)
-		}
-
-		return parsedValue
-	}
-
 	private isPlategaStatus(status: string): status is PlategaPaymentStatus {
 		return (PLATEGA_PAYMENT_STATUSES as readonly string[]).includes(status)
-	}
-
-	private isPlategaPaymentMethod(
-		paymentMethod: number
-	): paymentMethod is PlategaPaymentMethod {
-		return (
-			Number.isInteger(paymentMethod) &&
-			(PLATEGA_PAYMENT_METHODS as readonly number[]).includes(
-				paymentMethod
-			)
-		)
-	}
-
-	private isSupportedPlategaPaymentMethod(
-		paymentMethod: PlategaPaymentMethod
-	): paymentMethod is SupportedPlategaPaymentMethod {
-		return (
-			paymentMethod === PLATEGA_PAYMENT_METHOD_BY_PAYMENT_METHOD.sbp ||
-			paymentMethod === PLATEGA_PAYMENT_METHOD_BY_PAYMENT_METHOD.card
-		)
-	}
-
-	private isConfirmedAmountValid(
-		callbackAmount: number,
-		paymentAmount: number
-	): boolean {
-		const callbackAmountKopecks = this.toKopecks(callbackAmount)
-
-		return this.getAllowedConfirmedAmounts(paymentAmount)
-			.map(amount => this.toKopecks(amount))
-			.includes(callbackAmountKopecks)
-	}
-
-	private getAllowedConfirmedAmounts(paymentAmount: number): number[] {
-		const amountWithCommission =
-			paymentAmount * (1 + this.getPlategaCommissionPercent() / 100)
-		const roundedAmountWithCommission =
-			this.toKopecks(amountWithCommission) / 100
-
-		if (roundedAmountWithCommission === paymentAmount) {
-			return [paymentAmount]
-		}
-
-		return [paymentAmount, roundedAmountWithCommission]
-	}
-
-	private getPlategaCommissionPercent(): number {
-		const rawCommissionPercent = this.configService.get<string | number>(
-			'PLATEGA_COMMISSION_PERCENT'
-		)
-
-		if (rawCommissionPercent === undefined) {
-			return PLATEGA_DEFAULT_COMMISSION_PERCENT
-		}
-
-		const commissionPercent = Number(
-			String(rawCommissionPercent).replace(',', '.')
-		)
-
-		if (!Number.isFinite(commissionPercent) || commissionPercent < 0) {
-			return PLATEGA_DEFAULT_COMMISSION_PERCENT
-		}
-
-		return commissionPercent
-	}
-
-	private toKopecks(amount: number): number {
-		return Math.round(amount * 100)
 	}
 
 	private buildCreateTransactionBody(

@@ -12,9 +12,9 @@ export type PlategaPaymentMethod = (typeof PLATEGA_PAYMENT_METHODS)[number]
 
 export type PaymentWebhookDto = {
 	id: string
-	amount: number
-	currency: 'RUB'
+	amount?: number
+	currency?: string
 	status: PlategaPaymentStatus
-	paymentMethod: PlategaPaymentMethod
+	paymentMethod?: number
 	payload?: string
 }
