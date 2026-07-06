@@ -7,6 +7,10 @@ import {
 	Min
 } from 'class-validator'
 
+export const PAYMENT_METHODS = ['sbp', 'card'] as const
+
+export type PaymentMethod = (typeof PAYMENT_METHODS)[number]
+
 export class PaymentDto {
 	@IsString({ message: 'userId должно быть строкой.' })
 	@IsNotEmpty({ message: 'userId обязателен для заполнения.' })
@@ -16,6 +20,10 @@ export class PaymentDto {
 	@Min(1, { message: 'sum должно быть больше 0.' })
 	@IsNotEmpty({ message: 'sum обязателен для заполнения.' })
 	amount: number
+
+	@IsIn(PAYMENT_METHODS, { message: 'method должно быть sbp или card.' })
+	@IsNotEmpty({ message: 'method обязателен для заполнения.' })
+	paymentMethod: PaymentMethod
 
 	@IsIn(['RUB'], { message: 'currency должно быть RUB.' })
 	@IsOptional()

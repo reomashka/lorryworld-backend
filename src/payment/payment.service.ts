@@ -12,7 +12,7 @@ import { LoggerService } from '@/logger/logger.service'
 import { PrismaService } from '@/prisma/prisma.service'
 import { TelegramService } from '@/telegram/telegram.service'
 
-import { PaymentDto } from './dto/payment.dto'
+import { PaymentDto, type PaymentMethod } from './dto/payment.dto'
 import {
 	PaymentWebhookDto,
 	PLATEGA_PAYMENT_METHODS,
@@ -22,11 +22,21 @@ import {
 } from './dto/paymentWebhook.dto'
 
 const PLATEGA_BASE_URL = 'https://app.platega.io'
-const PLATEGA_PAYMENT_METHOD = 2
+const PLATEGA_PAYMENT_METHOD_BY_PAYMENT_METHOD = {
+	sbp: 2,
+	card: 11
+} as const satisfies Record<PaymentMethod, PlategaPaymentMethod>
+const PLATEGA_SUPPORTED_PAYMENT_METHODS = [
+	PLATEGA_PAYMENT_METHOD_BY_PAYMENT_METHOD.sbp,
+	PLATEGA_PAYMENT_METHOD_BY_PAYMENT_METHOD.card
+] as const
 const PLATEGA_DEFAULT_COMMISSION_PERCENT = 3.5
 
+type SupportedPlategaPaymentMethod =
+	(typeof PLATEGA_SUPPORTED_PAYMENT_METHODS)[number]
+
 type PlategaCreateTransactionRequest = {
-	paymentMethod: typeof PLATEGA_PAYMENT_METHOD
+	paymentMethod: SupportedPlategaPaymentMethod
 	paymentDetails: {
 		amount: number
 		currency: 'RUB'
@@ -243,7 +253,7 @@ export class PaymentService {
 			})}`
 		)
 
-		if (payload.paymentMethod !== PLATEGA_PAYMENT_METHOD) {
+		if (!this.isSupportedPlategaPaymentMethod(payload.paymentMethod)) {
 			throw new BadRequestException('Unsupported Platega payment method')
 		}
 
@@ -456,6 +466,15 @@ export class PaymentService {
 		)
 	}
 
+	private isSupportedPlategaPaymentMethod(
+		paymentMethod: PlategaPaymentMethod
+	): paymentMethod is SupportedPlategaPaymentMethod {
+		return (
+			paymentMethod === PLATEGA_PAYMENT_METHOD_BY_PAYMENT_METHOD.sbp ||
+			paymentMethod === PLATEGA_PAYMENT_METHOD_BY_PAYMENT_METHOD.card
+		)
+	}
+
 	private isConfirmedAmountValid(
 		callbackAmount: number,
 		paymentAmount: number
@@ -510,7 +529,7 @@ export class PaymentService {
 		currency: 'RUB'
 	): PlategaCreateTransactionRequest {
 		const requestBody: PlategaCreateTransactionRequest = {
-			paymentMethod: PLATEGA_PAYMENT_METHOD,
+			paymentMethod: this.getPlategaPaymentMethod(dto.paymentMethod),
 			paymentDetails: {
 				amount,
 				currency
@@ -544,6 +563,12 @@ export class PaymentService {
 		}
 
 		return requestBody
+	}
+
+	private getPlategaPaymentMethod(
+		paymentMethod: PaymentMethod
+	): SupportedPlategaPaymentMethod {
+		return PLATEGA_PAYMENT_METHOD_BY_PAYMENT_METHOD[paymentMethod]
 	}
 
 	private mapPlategaStatus(status: PlategaPaymentStatus): PaymentStatus {
